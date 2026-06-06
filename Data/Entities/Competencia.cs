@@ -1,7 +1,7 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Data.Entities
+﻿namespace Data.Entities
 {
+    using System.Text.RegularExpressions;
+
     public class Competencia
     {
         private readonly string regexPadraoCompetencia = @"^\d{4}-(0[1-9]|1[0-2])$";
