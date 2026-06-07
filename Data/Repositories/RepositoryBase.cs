@@ -35,7 +35,7 @@
             return result;
         }
 
-        private TConnectionReturn? ExecuteSQL<TConnectionReturn>(string sql, Func<SqlDataReader, TConnectionReturn> dataMapper)
+        private TMappedData? ExecuteSQL<TMappedData>(string sql, Func<SqlDataReader, TMappedData> dataMapper)
         {
             using SqlConnection connection = new (this.connectionString);
             connection.Open();
