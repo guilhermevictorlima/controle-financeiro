@@ -26,6 +26,14 @@
             command.ExecuteNonQuery();
         }
 
+        internal static void EntityPersistenceMapper(SqlCommand command, Dictionary<string, object> parameters)
+        {
+            foreach (var param in parameters)
+            {
+                command.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+            }
+        }
+
         internal abstract TEntity EntityResultMapper(SqlDataReader reader);
 
         internal List<TEntity> EntityResultListMapper(SqlDataReader reader)
@@ -38,14 +46,6 @@
             }
 
             return result;
-        }
-
-        internal static void EntityPersistenceMapper(SqlCommand command, Dictionary<string, object> parameters)
-        {
-            foreach (var param in parameters)
-            {
-                command.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
-            }
         }
 
         private TMappedData? ExecuteQuery<TMappedData>(string sql, Func<SqlDataReader, TMappedData> dataMapper)
