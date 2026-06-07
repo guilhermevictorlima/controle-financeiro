@@ -28,12 +28,9 @@
                     valor_calculado,
                     data_lancamento,
                     data_criacao,
-                    data_pagamento,
-                    data_cancelamento,
-                    competencia,
-                    status)
+                    competencia
+                )
                 values (
-                    @id,
                     @descricao,
                     @tipo,
                     @valor_original,
@@ -42,10 +39,7 @@
                     @valor_calculado,
                     @data_lancamento,
                     @data_criacao,
-                    @data_pagamento,
-                    @data_cancelamento,
-                    @competencia,
-                    @status
+                    @competencia
                 )
                 """;
 
