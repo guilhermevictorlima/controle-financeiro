@@ -1,10 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Data.Models.DTOs
+﻿namespace Data.Models.DTOs
 {
-    public record CriarLancamentoFinanceiroDTO
-    {
-    }
+    using Data.Models.Enums;
+
+    public record CriarLancamentoFinanceiroDTO(
+        string Descricao,
+        TipoLancamento Tipo,
+        decimal ValorOriginal,
+        decimal PercentualTaxa,
+        decimal PercentualDesconto,
+        decimal ValorCalculado,
+        DateTime DataLancamento,
+        string Competencia
+    );
 }
