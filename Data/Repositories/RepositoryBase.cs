@@ -4,9 +4,7 @@
 
     public abstract class RepositoryBase<TEntity, TId>
     {
-
         private readonly string connectionString = "Server=localhost;Database=controle_financeiro;User Id=sa;Password=admin;TrustServerCertificate=True;";
-
 
         public List<TEntity> List(string sql)
         {
@@ -45,13 +43,8 @@
             using SqlCommand command = new (sql, connection);
             using SqlDataReader reader = command.ExecuteReader();
 
-            if (!reader.Read())
-            {
-                return default;
-            }
-
-            return dataMapper(reader);
+            bool hasData = reader.Read();
+            return hasData ? dataMapper(reader) : default;
         }
-
     }
 }
