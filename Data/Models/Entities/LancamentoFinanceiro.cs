@@ -2,6 +2,7 @@
 {
     using System.Text.RegularExpressions;
     using Data.Models.Enums;
+    using Data.Models.Validators;
 
     public class LancamentoFinanceiro
     {
@@ -33,12 +34,7 @@
 
             set
             {
-                string regexPadraoCompetencia = @"^\d{4}-(0[1-9]|1[0-2])$";
-                if (!Regex.IsMatch(value, regexPadraoCompetencia))
-                {
-                    throw new ArgumentException("A competência deve estar no formato YYYY-MM.", nameof(value));
-                }
-
+                CompetenciaValidator.Validate(value);
                 field = value;
             }
         }
