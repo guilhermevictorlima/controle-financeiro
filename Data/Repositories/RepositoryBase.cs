@@ -2,40 +2,53 @@
 {
     using Microsoft.Data.SqlClient;
 
-    public abstract class RepositoryBase<TEntity, TId>
+    public abstract class RepositoryBase<TEntity>
     {
         private readonly string connectionString = "Server=localhost;Database=controle_financeiro;User Id=sa;Password=admin;TrustServerCertificate=True;";
 
         public List<TEntity> List(string sql)
         {
-            return this.ExecuteSQL(sql, this.EntityListMapper) ?? [];
+            return this.ExecuteQuery(sql, this.EntityResultListMapper) ?? [];
         }
 
         public virtual TEntity? Get(string sql)
         {
-            return this.ExecuteSQL(sql, this.EntityMapper);
+            return this.ExecuteQuery(sql, this.EntityResultMapper);
         }
 
-        public TEntity? Update(string sql)
+        public void Persist(string sql, Dictionary<string, object> parameters)
         {
-            return default;
+            using SqlConnection connection = new (this.connectionString);
+            connection.Open();
+
+            using SqlCommand command = new (sql, connection);
+            EntityPersistenceMapper(command, parameters);
+            command.ExecuteNonQuery();
         }
 
-        internal abstract TEntity EntityMapper(SqlDataReader reader);
+        internal abstract TEntity EntityResultMapper(SqlDataReader reader);
 
-        internal List<TEntity> EntityListMapper(SqlDataReader reader)
+        internal List<TEntity> EntityResultListMapper(SqlDataReader reader)
         {
             List<TEntity> result = [];
 
             while (reader.Read())
             {
-                result.Add(this.EntityMapper(reader));
+                result.Add(this.EntityResultMapper(reader));
             }
 
             return result;
         }
 
-        private TMappedData? ExecuteSQL<TMappedData>(string sql, Func<SqlDataReader, TMappedData> dataMapper)
+        internal static void EntityPersistenceMapper(SqlCommand command, Dictionary<string, object> parameters)
+        {
+            foreach (var param in parameters)
+            {
+                command.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+            }
+        }
+
+        private TMappedData? ExecuteQuery<TMappedData>(string sql, Func<SqlDataReader, TMappedData> dataMapper)
         {
             using SqlConnection connection = new (this.connectionString);
             connection.Open();
