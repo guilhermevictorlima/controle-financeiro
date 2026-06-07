@@ -1,10 +1,10 @@
-﻿namespace Data.Entities
+﻿namespace Data.Models.Entities
 {
-    using Data.Enums;
+    using Data.Models.Enums;
+    using System.Text.RegularExpressions;
 
     public class LancamentoFinanceiro
     {
-
         required public int Id { get; init; }
 
         required public string Descricao { get; set; }
@@ -27,7 +27,22 @@
 
         public DateTime? DataCancelamento { get; set; }
 
-        required public string Competencia { get; set; }
+        required public string Competencia
+        {
+            get
+            {
+                return this.Competencia;
+            }
+
+            set
+            {
+                string regexPadraoCompetencia = @"^\d{4}-(0[1-9]|1[0-2])$";
+                if (!Regex.IsMatch(value, regexPadraoCompetencia))
+                {
+                    throw new ArgumentException("A competência deve estar no formato YYYY-MM.", nameof(value));
+                }
+            }
+        }
 
         required public StatusLancamento Status { get; set; }
     }
