@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Data.Models.DTOs
 {
-    internal class Class1
+    public record CriarLancamentoFinanceiroDTO
     {
     }
 }
