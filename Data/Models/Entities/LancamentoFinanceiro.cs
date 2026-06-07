@@ -1,7 +1,7 @@
 ﻿namespace Data.Models.Entities
 {
-    using Data.Models.Enums;
     using System.Text.RegularExpressions;
+    using Data.Models.Enums;
 
     public class LancamentoFinanceiro
     {
@@ -29,10 +29,7 @@
 
         required public string Competencia
         {
-            get
-            {
-                return this.Competencia;
-            }
+            get;
 
             set
             {
@@ -41,6 +38,8 @@
                 {
                     throw new ArgumentException("A competência deve estar no formato YYYY-MM.", nameof(value));
                 }
+
+                field = value;
             }
         }
 
