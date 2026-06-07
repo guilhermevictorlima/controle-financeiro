@@ -1,4 +1,4 @@
-﻿namespace Data.Enums
+﻿namespace Data.Models.Enums
 {
     public enum TipoLancamento
     {
