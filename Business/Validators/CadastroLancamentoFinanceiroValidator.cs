@@ -35,9 +35,9 @@
 
             this.AdicionarValidacaoDataLancamentoCompativelComCompetencia(dto, violacoesDeNegocio);
             this.AdicionarValidacaoValorCalculado(dto, violacoesDeNegocio);
-            this.AdicionarValidacaoDuplicidadeLancamento(dto, violacoesDeNegocio);
-
             this.ExecutarValidacoes(violacoesDeNegocio);
+
+            this.ValidarDuplicidadeLancamento(dto);
         }
 
         private void ExecutarValidacoes(Dictionary<string, bool> violacoes)
@@ -88,14 +88,12 @@
             );
         }
 
-        private void AdicionarValidacaoDuplicidadeLancamento(CriarLancamentoFinanceiroDTO dto, Dictionary<string, bool> violacoes)
+        private void ValidarDuplicidadeLancamento(CriarLancamentoFinanceiroDTO dto)
         {
             VerificarLancamentoDuplicadoDTO verificarDuplicadoDTO = new(dto.Descricao, dto.Tipo, dto.Competencia);
 
-            violacoes.Add(
-                "Já existe um lançamento com a mesma descrição, tipo e competência.",
-                Repository.IsLancamentoDuplicado(verificarDuplicadoDTO)
-            );
+            if (Repository.IsLancamentoDuplicado(verificarDuplicadoDTO))
+                throw new LancamentoFinanceiroException("Já existe um lançamento com a mesma descrição, tipo e competência.");
         }
     }
 }
