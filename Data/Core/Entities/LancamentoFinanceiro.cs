@@ -1,8 +1,7 @@
 ﻿namespace Data.Models.Entities
 {
-    using System.Text.RegularExpressions;
+    using Data.Core.ValueObjects;
     using Data.Models.Enums;
-    using Data.Models.Validators;
 
     public class LancamentoFinanceiro
     {
@@ -28,16 +27,7 @@
 
         public DateTime? DataCancelamento { get; set; }
 
-        required public string Competencia
-        {
-            get;
-
-            set
-            {
-                CompetenciaValidator.Validate(value);
-                field = value;
-            }
-        }
+        required public Competencia Competencia { get; set; }
 
         required public StatusLancamento Status { get; set; }
     }

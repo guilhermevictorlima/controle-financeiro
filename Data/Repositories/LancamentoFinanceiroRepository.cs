@@ -1,5 +1,7 @@
 ﻿namespace Data.Repositories
 {
+    using Data.Core.DTOs;
+    using Data.Core.ValueObjects;
     using Data.Models.DTOs;
     using Data.Models.Entities;
     using Data.Models.Enums;
@@ -53,7 +55,7 @@
                 { "@valor_calculado",     dto.ValorCalculado },
                 { "@data_lancamento",     dto.DataLancamento },
                 { "@data_criacao",        DateTime.Now },
-                { "@competencia",         dto.Competencia },
+                { "@competencia",         dto.Competencia.ToString() },
             };
 
             this.Persist(sql, parameters);
@@ -74,7 +76,7 @@
                 DataCriacao = reader.GetDateTime(reader.GetOrdinal("data_criacao")),
                 DataPagamento = reader.IsDBNull(reader.GetOrdinal("data_pagamento")) ? null : reader.GetDateTime(reader.GetOrdinal("data_pagamento")),
                 DataCancelamento = reader.IsDBNull(reader.GetOrdinal("data_cancelamento")) ? null : reader.GetDateTime(reader.GetOrdinal("data_cancelamento")),
-                Competencia = reader.GetString(reader.GetOrdinal("competencia")),
+                Competencia = new Competencia(reader.GetString(reader.GetOrdinal("competencia"))),
                 Status = Enum.Parse<StatusLancamento>(reader.GetString(reader.GetOrdinal("status"))),
             };
         }

@@ -1,5 +1,6 @@
 ﻿namespace Data.Models.DTOs
 {
+    using Data.Core.ValueObjects;
     using Data.Models.Entities;
     using Data.Models.Enums;
 
@@ -15,7 +16,7 @@
         DateTime DataCriacao,
         DateTime? DataPagamento,
         DateTime? DataCancelamento,
-        string Competencia,
+        Competencia Competencia,
         StatusLancamento Status)
     {
         public static LancamentoFinanceiroResponseDTO FromEntity(LancamentoFinanceiro entity)

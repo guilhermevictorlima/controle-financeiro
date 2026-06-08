@@ -1,5 +1,6 @@
 ﻿namespace Data.Models.DTOs
 {
+    using Data.Core.ValueObjects;
     using Data.Models.Enums;
 
     public record CriarLancamentoFinanceiroDTO(
@@ -10,5 +11,5 @@
         decimal PercentualDesconto,
         decimal ValorCalculado,
         DateTime DataLancamento,
-        string Competencia);
+        Competencia Competencia);
 }
