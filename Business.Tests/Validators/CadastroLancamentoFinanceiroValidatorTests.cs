@@ -215,5 +215,80 @@
 
             Assert.Null(excecao);
         }
+
+        [Fact]
+        public void Validar_DeveLancarExcecao_QuandoLancamentoDuplicadoForDetectado()
+        {
+            this.repositoryMock
+                .Setup(r => r.IsLancamentoDuplicado(It.IsAny<VerificarLancamentoDuplicadoDTO>()))
+                .Returns(true);
+
+            LancamentoFinanceiroException excecao = Assert.Throws<LancamentoFinanceiroException>(
+                () => this.validator.Validar(CriarDTO()));
+
+            Assert.Equal("Já existe um lançamento com a mesma descrição, tipo e competência.", excecao.Message);
+        }
+
+        [Fact]
+        public void Validar_NaoDeveLancarExcecao_QuandoNaoHouverLancamentoDuplicado()
+        {
+            this.repositoryMock
+                .Setup(r => r.IsLancamentoDuplicado(It.IsAny<VerificarLancamentoDuplicadoDTO>()))
+                .Returns(false);
+
+            Exception excecao = Record.Exception(
+                () => this.validator.Validar(CriarDTO()));
+
+            Assert.Null(excecao);
+        }
+
+        [Fact]
+        public void Validar_DeveConsultarRepositorio_ComDadosCorretosDODTO()
+        {
+            this.repositoryMock
+                .Setup(r => r.IsLancamentoDuplicado(It.IsAny<VerificarLancamentoDuplicadoDTO>()))
+                .Returns(false);
+
+            this.validator.Validar(CriarDTO());
+
+            this.repositoryMock.Verify(
+                r => r.IsLancamentoDuplicado(It.Is<VerificarLancamentoDuplicadoDTO>(d =>
+                    d.Descricao == "Pagamento de fornecedor" &&
+                    d.Tipo == TipoLancamento.Debito &&
+                    d.Competencia == new Competencia("2024-06"))),
+                Times.Once);
+        }
+
+        [Fact]
+        public void Validar_DeveConsultarRepositorioExatamenteUmaVez_AoValidarLancamento()
+        {
+            this.validator.Validar(CriarDTO());
+
+            this.repositoryMock.Verify(
+                r => r.IsLancamentoDuplicado(It.IsAny<VerificarLancamentoDuplicadoDTO>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public void Validar_NaoDeveConsultarRepositorio_QuandoValidacaoDeIntegridadeFalhar()
+        {
+            Record.Exception(
+                () => this.validator.Validar(CriarDTO(descricao: null)));
+
+            this.repositoryMock.Verify(
+                r => r.IsLancamentoDuplicado(It.IsAny<VerificarLancamentoDuplicadoDTO>()),
+                Times.Never);
+        }
+
+        [Fact]
+        public void Validar_NaoDeveConsultarRepositorio_QuandoValidacaoDeNegocioFalharAntesDeDuplicidade()
+        {
+            Record.Exception(
+                () => this.validator.Validar(CriarDTO(dataLancamento: new DateTime(2024, 7, 1))));
+
+            this.repositoryMock.Verify(
+                r => r.IsLancamentoDuplicado(It.IsAny<VerificarLancamentoDuplicadoDTO>()),
+                Times.Never);
+        }
     }
 }
