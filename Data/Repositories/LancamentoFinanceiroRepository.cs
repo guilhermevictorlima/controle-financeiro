@@ -5,9 +5,10 @@
     using Data.Models.DTOs;
     using Data.Models.Entities;
     using Data.Models.Enums;
+    using Data.Repositories.Interfaces;
     using Microsoft.Data.SqlClient;
 
-    public class LancamentoFinanceiroRepository : RepositoryBase<LancamentoFinanceiro>
+    public class LancamentoFinanceiroRepository : RepositoryBase<LancamentoFinanceiro>, ILancamentoFinanceiroRepository
     {
         public LancamentoFinanceiro? Get(int id)
         {
@@ -18,7 +19,7 @@
                 """);
         }
 
-        public void Save(CriarLancamentoFinanceiroDTO dto)
+        public LancamentoFinanceiro Save(CriarLancamentoFinanceiroDTO dto)
         {
             string sql = """
                 insert into lancamento_financeiro (
@@ -59,6 +60,20 @@
             };
 
             this.Persist(sql, parameters);
+
+            // return this.GetLastInserted();
+            return default;
+        }
+
+        public bool IsLancamentoDuplicado(VerificarLancamentoDuplicadoDTO dto)
+        {
+            return this.List($"""
+                select count(1)
+                from lancamento_financeiro
+                where descricao = {dto.Descricao}
+                  and tipo = {dto.Tipo.ToString()}
+                  and competencia = {dto.Competencia.ToString()}
+                """).Count != 0;
         }
 
         internal override LancamentoFinanceiro EntityResultMapper(SqlDataReader reader)

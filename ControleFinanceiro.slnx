@@ -2,5 +2,8 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
+  <Project Path="Business.Tests/Business.Tests.csproj" Id="caba800d-7a3e-427b-9feb-ee9e3c48db8f" />
+  <Project Path="Business/Business.csproj" Id="ea87462e-2c15-482f-9394-921651bbc095" />
+  <Project Path="Data.Tests/Data.Tests.csproj" Id="66fc388f-03e5-4ef1-94a6-020c147b454c" />
   <Project Path="Data/Data.csproj" />
 </Solution>
