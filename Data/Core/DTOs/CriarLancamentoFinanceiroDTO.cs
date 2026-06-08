@@ -10,6 +10,5 @@
         decimal PercentualDesconto,
         decimal ValorCalculado,
         DateTime DataLancamento,
-        string Competencia
-    );
+        string Competencia);
 }
