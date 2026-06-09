@@ -3,6 +3,7 @@
     using Business.Exporters;
     using Business.Validators;
     using Data.Core.DTOs;
+    using Data.Core.ValueObjects;
     using Data.Repositories;
 
     public class LancamentoFinanceiroService
@@ -43,10 +44,11 @@
 
         public ArquivoExportadoDTO ExportarLancamentos(ExportarLancamentosDTO dto)
         {
-            IReadOnlyList<LancamentoFinanceiroResponseDTO> registros = Repository.ListarPorCompetencia(dto.Competencia);
+            var competencia = new Competencia(dto.Competencia);
+            IReadOnlyList<LancamentoFinanceiroResponseDTO> registros = Repository.ListarPorCompetencia(competencia);
             
             return LancamentoFinanceiroExporterFactory.Criar(dto.TipoExportacao)
-                    .Exportar(registros, dto.Competencia);
+                    .Exportar(registros, competencia);
         }
 
     }
