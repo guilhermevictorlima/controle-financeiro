@@ -1,4 +1,4 @@
-﻿namespace Data.Models.DTOs
+﻿namespace Data.Core.DTOs
 {
     using Data.Core.ValueObjects;
     using Data.Models.Entities;

@@ -3,7 +3,8 @@
     using Data.Core.ValueObjects;
     using Data.Models.Enums;
 
-    public record CriarLancamentoFinanceiroDTO(
+    public record EditarLancamentoFinanceiroDTO(
+        int Id,
         string Descricao,
         TipoLancamento Tipo,
         decimal ValorOriginal,

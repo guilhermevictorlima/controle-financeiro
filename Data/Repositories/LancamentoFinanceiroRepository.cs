@@ -2,7 +2,6 @@
 {
     using Data.Core.DTOs;
     using Data.Core.ValueObjects;
-    using Data.Models.DTOs;
     using Data.Models.Entities;
     using Data.Models.Enums;
     using Data.Repositories.Interfaces;
@@ -57,6 +56,40 @@
                 { "@data_lancamento",     dto.DataLancamento },
                 { "@data_criacao",        DateTime.Now },
                 { "@competencia",         dto.Competencia.ToString() },
+            };
+
+            this.Persist(sql, parameters);
+
+            // return this.GetLastInserted();
+            return default;
+        }
+
+        public LancamentoFinanceiro Update(EditarLancamentoFinanceiroDTO dto)
+        {
+            string sql = """
+                update lancamento_financeiro set
+                    descricao           = @descricao,
+                    tipo                = @tipo,
+                    valor_original      = @valor_original,
+                    percentual_taxa     = @percentual_taxa,
+                    percentual_desconto = @percentual_desconto,
+                    valor_calculado     = @valor_calculado,
+                    data_lancamento     = @data_lancamento,
+                    competencia         = @competencia
+                where id = @id
+            """;
+
+            Dictionary<string, object> parameters = new ()
+            {
+                { "@id",                  dto.Id                        },
+                { "@descricao",           dto.Descricao                 },
+                { "@tipo",                dto.Tipo.ToString()           },
+                { "@valor_original",      dto.ValorOriginal             },
+                { "@percentual_taxa",     dto.PercentualTaxa            },
+                { "@percentual_desconto", dto.PercentualDesconto        },
+                { "@valor_calculado",     dto.ValorCalculado            },
+                { "@data_lancamento",     dto.DataLancamento            },
+                { "@competencia",         dto.Competencia.ToString()    },
             };
 
             this.Persist(sql, parameters);

@@ -2,24 +2,24 @@
 {
     using Business.Validators;
     using Data.Core.DTOs;
-    using Data.Models.DTOs;
     using Data.Repositories;
 
     public class LancamentoFinanceiroService
     {
         private static readonly LancamentoFinanceiroRepository Repository = new();
         private static readonly CadastroLancamentoFinanceiroValidator CadastroValidator = new(Repository);
+        private static readonly EdicaoLancamentoFinanceiroValidator EdicaoValidator = new(Repository);
 
         public LancamentoFinanceiroResponseDTO CadastrarLancamento(CriarLancamentoFinanceiroDTO dto)
         {
             CadastroValidator.Validar(dto);
-            return this.Persistir(dto);
+            return LancamentoFinanceiroResponseDTO.FromEntity(Repository.Save(dto));
         }
 
-        private LancamentoFinanceiroResponseDTO Persistir(CriarLancamentoFinanceiroDTO dto)
+        public LancamentoFinanceiroResponseDTO EditarLancamento(EditarLancamentoFinanceiroDTO dto)
         {
-            var entity = Repository.Save(dto);
-            return LancamentoFinanceiroResponseDTO.FromEntity(entity);
+            EdicaoValidator.Validar(dto);
+            return LancamentoFinanceiroResponseDTO.FromEntity(Repository.Update(dto));
         }
     }
 }

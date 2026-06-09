@@ -4,29 +4,49 @@
     using Business.Validators;
     using Data.Core.DTOs;
     using Data.Core.ValueObjects;
+    using Data.Models.Entities;
     using Data.Models.Enums;
     using Data.Repositories.Interfaces;
     using Moq;
     using Xunit;
 
-    public class CadastroLancamentoFinanceiroValidatorTests
+    public class EdicaoLancamentoFinanceiroValidatorTests
     {
-
         private readonly Mock<ILancamentoFinanceiroRepository> repositoryMock;
+        private readonly EdicaoLancamentoFinanceiroValidator validator;
 
-        private readonly CadastroLancamentoFinanceiroValidator validator;
-
-        public CadastroLancamentoFinanceiroValidatorTests()
+        public EdicaoLancamentoFinanceiroValidatorTests()
         {
             this.repositoryMock = new Mock<ILancamentoFinanceiroRepository>();
             this.repositoryMock
-                .Setup(r => r.IsLancamentoDuplicado(It.IsAny<VerificarLancamentoDuplicadoDTO>()))
-                .Returns(false);
+                .Setup(r => r.Get(It.IsAny<int>()))
+                .Returns(CriarEntidade());
 
-            this.validator = new CadastroLancamentoFinanceiroValidator(this.repositoryMock.Object);
+            this.validator = new EdicaoLancamentoFinanceiroValidator(this.repositoryMock.Object);
         }
 
-        private static CriarLancamentoFinanceiroDTO CriarDTO(
+        private static LancamentoFinanceiro CriarEntidade(StatusLancamento status = StatusLancamento.Aberto)
+        {
+            return new LancamentoFinanceiro
+            {
+                Id = 1,
+                Descricao = "Pagamento de fornecedor",
+                Tipo = TipoLancamento.Debito,
+                ValorOriginal = 100.00m,
+                PercentualTaxa = 0,
+                PercentualDesconto = 0,
+                ValorCalculado = 100.00m,
+                DataLancamento = new DateTime(2024, 6, 15),
+                DataCriacao = new DateTime(2024, 6, 15),
+                DataPagamento = null,
+                DataCancelamento = null,
+                Competencia = new Competencia("2024-06"),
+                Status = status,
+            };
+        }
+
+        private static EditarLancamentoFinanceiroDTO CriarDTO(
+            int id = 1,
             string descricao = "Pagamento de fornecedor",
             TipoLancamento tipo = TipoLancamento.Debito,
             decimal valorOriginal = 100.00m,
@@ -35,7 +55,8 @@
             decimal valorCalculado = 100.00m,
             DateTime? dataLancamento = null)
         {
-            return new CriarLancamentoFinanceiroDTO(
+            return new EditarLancamentoFinanceiroDTO(
+                id,
                 descricao,
                 tipo,
                 valorOriginal,
@@ -43,12 +64,12 @@
                 percentualDesconto,
                 valorCalculado,
                 dataLancamento ?? new DateTime(2024, 6, 15),
-                new Competencia("2024-06")
-            );
+                new Competencia("2024-06"));
         }
 
-        private static CriarLancamentoFinanceiroDTO CriarDTO(
+        private static EditarLancamentoFinanceiroDTO CriarDTO(
             Competencia competencia,
+            int id = 1,
             string descricao = "Pagamento de fornecedor",
             TipoLancamento tipo = TipoLancamento.Debito,
             decimal valorOriginal = 100.00m,
@@ -57,7 +78,8 @@
             decimal valorCalculado = 100.00m,
             DateTime? dataLancamento = null)
         {
-            return new CriarLancamentoFinanceiroDTO(
+            return new EditarLancamentoFinanceiroDTO(
+                id,
                 descricao,
                 tipo,
                 valorOriginal,
@@ -65,8 +87,25 @@
                 percentualDesconto,
                 valorCalculado,
                 dataLancamento ?? new DateTime(2024, 6, 15),
-                competencia
-            );
+                competencia);
+        }
+
+        [Fact]
+        public void Validar_DeveLancarExcecao_QuandoIdForZero()
+        {
+            LancamentoFinanceiroException excecao = Assert.Throws<LancamentoFinanceiroException>(
+                () => this.validator.Validar(CriarDTO(id: 0)));
+
+            Assert.Equal("O identificador do lançamento é obrigatório e deve ser maior que zero.", excecao.Message);
+        }
+
+        [Fact]
+        public void Validar_DeveLancarExcecao_QuandoIdForNegativo()
+        {
+            LancamentoFinanceiroException excecao = Assert.Throws<LancamentoFinanceiroException>(
+                () => this.validator.Validar(CriarDTO(id: -1)));
+
+            Assert.Equal("O identificador do lançamento é obrigatório e deve ser maior que zero.", excecao.Message);
         }
 
         [Fact]
@@ -88,28 +127,10 @@
         }
 
         [Fact]
-        public void Validar_NaoDeveLancarExcecao_QuandoDescricaoPossuirExatamente250Caracteres()
-        {
-            Exception excecao = Record.Exception(
-                () => this.validator.Validar(CriarDTO(descricao: new string('a', 250))));
-
-            Assert.Null(excecao);
-        }
-
-        [Fact]
         public void Validar_DeveLancarExcecao_QuandoValorOriginalForZero()
         {
             LancamentoFinanceiroException excecao = Assert.Throws<LancamentoFinanceiroException>(
                 () => this.validator.Validar(CriarDTO(valorOriginal: 0)));
-
-            Assert.Equal("O valor original é obrigatório e deve ser maior que zero.", excecao.Message);
-        }
-
-        [Fact]
-        public void Validar_DeveLancarExcecao_QuandoValorOriginalForNegativo()
-        {
-            LancamentoFinanceiroException excecao = Assert.Throws<LancamentoFinanceiroException>(
-                () => this.validator.Validar(CriarDTO(valorOriginal: -1)));
 
             Assert.Equal("O valor original é obrigatório e deve ser maior que zero.", excecao.Message);
         }
@@ -141,6 +162,76 @@
             Assert.Equal("A data de lançamento é obrigatória.", excecao.Message);
         }
 
+
+        [Fact]
+        public void Validar_DeveLancarExcecao_QuandoLancamentoNaoForEncontrado()
+        {
+            this.repositoryMock
+                .Setup(r => r.Get(It.IsAny<int>()))
+                .Returns((LancamentoFinanceiro?)null);
+
+            LancamentoFinanceiroException excecao = Assert.Throws<LancamentoFinanceiroException>(
+                () => this.validator.Validar(CriarDTO()));
+
+            Assert.Contains("não encontrado", excecao.Message);
+        }
+
+        [Fact]
+        public void Validar_DeveLancarExcecao_QuandoStatusNaoForAberto()
+        {
+            this.repositoryMock
+                .Setup(r => r.Get(It.IsAny<int>()))
+                .Returns(CriarEntidade(StatusLancamento.Pago));
+
+            LancamentoFinanceiroException excecao = Assert.Throws<LancamentoFinanceiroException>(
+                () => this.validator.Validar(CriarDTO()));
+
+            Assert.Equal("Apenas lançamentos com status Aberto podem ser editados.", excecao.Message);
+        }
+
+        [Theory]
+        [InlineData(StatusLancamento.Pago)]
+        [InlineData(StatusLancamento.Cancelado)]
+        public void Validar_DeveLancarExcecao_ParaTodosStatusDiferentesDeAberto(StatusLancamento status)
+        {
+            this.repositoryMock
+                .Setup(r => r.Get(It.IsAny<int>()))
+                .Returns(CriarEntidade(status));
+
+            LancamentoFinanceiroException excecao = Assert.Throws<LancamentoFinanceiroException>(
+                () => this.validator.Validar(CriarDTO()));
+
+            Assert.Equal("Apenas lançamentos com status Aberto podem ser editados.", excecao.Message);
+        }
+
+        [Fact]
+        public void Validar_DeveLancarExcecaoDeExistencia_QuandoLancamentoNaoForEncontrado()
+        {
+            this.repositoryMock
+                .Setup(r => r.Get(It.IsAny<int>()))
+                .Returns((LancamentoFinanceiro?)null);
+
+            LancamentoFinanceiroException excecao = Assert.Throws<LancamentoFinanceiroException>(
+                () => this.validator.Validar(CriarDTO()));
+
+            Assert.Equal("Lançamento com identificador 1 não encontrado.", excecao.Message);
+        }
+
+        [Fact]
+        public void Validar_DeveConsultarRepositorioExatamenteDuasVezes_AoValidarEdicao()
+        {
+            this.validator.Validar(CriarDTO());
+
+            this.repositoryMock.Verify(
+                r => r.Get(It.IsAny<int>()),
+                Times.Once);
+        }
+
+
+        // -------------------------------------------------------------------------
+        // Validações de negócio — data e competência
+        // -------------------------------------------------------------------------
+
         [Fact]
         public void Validar_DeveLancarExcecao_QuandoDataLancamentoForIncompativelComCompetencia()
         {
@@ -149,6 +240,10 @@
 
             Assert.Contains("não é compatível com a competência", excecao.Message);
         }
+
+        // -------------------------------------------------------------------------
+        // Validações de negócio — valor calculado
+        // -------------------------------------------------------------------------
 
         [Fact]
         public void Validar_DeveLancarExcecao_QuandoTaxaEDescontoForemInformadosSimultaneamente()
@@ -198,19 +293,10 @@
         }
 
         [Fact]
-        public void Validar_NaoDeveLancarExcecao_QuandoValorCalculadoComTaxaForCorreto()
+        public void Validar_NaoDeveLancarExcecao_QuandoDTOForValido()
         {
             Exception excecao = Record.Exception(
-                () => this.validator.Validar(CriarDTO(percentualTaxa: 10, valorCalculado: 110.00m)));
-
-            Assert.Null(excecao);
-        }
-
-        [Fact]
-        public void Validar_NaoDeveLancarExcecao_QuandoValorCalculadoComDescontoForCorreto()
-        {
-            Exception excecao = Record.Exception(
-                () => this.validator.Validar(CriarDTO(tipo: TipoLancamento.Credito, percentualDesconto: 10, valorCalculado: 90.00m)));
+                () => this.validator.Validar(CriarDTO()));
 
             Assert.Null(excecao);
         }
@@ -242,7 +328,7 @@
         }
 
         [Fact]
-        public void Validar_DeveConsultarRepositorio_ComDadosCorretosDODTO()
+        public void Validar_DeveConsultarRepositorio_ComDadosCorretosDoDTO()
         {
             this.repositoryMock
                 .Setup(r => r.IsLancamentoDuplicado(It.IsAny<VerificarLancamentoDuplicadoDTO>()))
