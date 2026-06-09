@@ -6,7 +6,6 @@
     using Data.Models.Enums;
     using Data.Repositories.Interfaces;
     using Microsoft.Data.SqlClient;
-    using System.Text;
 
     public class LancamentoFinanceiroRepository : RepositoryBase<LancamentoFinanceiro>, ILancamentoFinanceiroRepository
     {

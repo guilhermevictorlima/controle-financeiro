@@ -42,30 +42,7 @@
                 percentualTaxa,
                 percentualDesconto,
                 valorCalculado,
-                dataLancamento ?? new DateTime(2024, 6, 15),
-                new Competencia("2024-06")
-            );
-        }
-
-        private static CriarLancamentoFinanceiroDTO CriarDTO(
-            Competencia competencia,
-            string descricao = "Pagamento de fornecedor",
-            TipoLancamento tipo = TipoLancamento.Debito,
-            decimal valorOriginal = 100.00m,
-            decimal percentualTaxa = 0,
-            decimal percentualDesconto = 0,
-            decimal valorCalculado = 100.00m,
-            DateTime? dataLancamento = null)
-        {
-            return new CriarLancamentoFinanceiroDTO(
-                descricao,
-                tipo,
-                valorOriginal,
-                percentualTaxa,
-                percentualDesconto,
-                valorCalculado,
-                dataLancamento ?? new DateTime(2024, 6, 15),
-                competencia
+                dataLancamento ?? new DateTime(2024, 6, 15)
             );
         }
 
@@ -123,14 +100,6 @@
             Assert.Equal("O valor calculado é obrigatório e deve ser maior que zero.", excecao.Message);
         }
 
-        [Fact]
-        public void Validar_DeveLancarExcecao_QuandoCompetenciaForDefault()
-        {
-            LancamentoFinanceiroException excecao = Assert.Throws<LancamentoFinanceiroException>(
-                () => this.validator.Validar(CriarDTO(competencia: default)));
-
-            Assert.Equal("A competência é obrigatória.", excecao.Message);
-        }
 
         [Fact]
         public void Validar_DeveLancarExcecao_QuandoDataLancamentoForDefault()
@@ -141,14 +110,6 @@
             Assert.Equal("A data de lançamento é obrigatória.", excecao.Message);
         }
 
-        [Fact]
-        public void Validar_DeveLancarExcecao_QuandoDataLancamentoForIncompativelComCompetencia()
-        {
-            LancamentoFinanceiroException excecao = Assert.Throws<LancamentoFinanceiroException>(
-                () => this.validator.Validar(CriarDTO(dataLancamento: new DateTime(2024, 7, 1))));
-
-            Assert.Contains("não é compatível com a competência", excecao.Message);
-        }
 
         [Fact]
         public void Validar_DeveLancarExcecao_QuandoTaxaEDescontoForemInformadosSimultaneamente()
@@ -273,17 +234,6 @@
         {
             Record.Exception(
                 () => this.validator.Validar(CriarDTO(descricao: null)));
-
-            this.repositoryMock.Verify(
-                r => r.IsLancamentoDuplicado(It.IsAny<VerificarLancamentoDuplicadoDTO>()),
-                Times.Never);
-        }
-
-        [Fact]
-        public void Validar_NaoDeveConsultarRepositorio_QuandoValidacaoDeNegocioFalharAntesDeDuplicidade()
-        {
-            Record.Exception(
-                () => this.validator.Validar(CriarDTO(dataLancamento: new DateTime(2024, 7, 1))));
 
             this.repositoryMock.Verify(
                 r => r.IsLancamentoDuplicado(It.IsAny<VerificarLancamentoDuplicadoDTO>()),
