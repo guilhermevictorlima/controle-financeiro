@@ -497,6 +497,12 @@
                 background: #EFF6FF;
             }
 
+            .btn-icon.pay:hover {
+                border-color: var(--green);
+                color: var(--green);
+                background: #F0FDF4;
+            }
+
             .btn-icon.del:hover {
                 border-color: var(--red);
                 color: var(--red);
@@ -667,7 +673,7 @@
                         <i class="bi bi-wallet2"></i>
                     </div>
                     <div>
-                        <div class="kpi-label">Total dos Lançamentos</div>
+                        <div class="kpi-label">Saldo do Período</div>
                         <div class="kpi-value" id="kpiTotal">R$ 0,00</div>
                         <div class="kpi-sub" id="kpiTotalSub">
                             <span class="badge-tipo badge-credito me-1">0 créditos</span>
@@ -1207,6 +1213,19 @@
                 var valCls = cred ? 'val-credit' : 'val-debit';
                 var st = STATUS_MAP[item.status] || { cls: 'badge-aberto', lbl: String(item.status) };
 
+                var isPago = item.status === 'Pago' || item.status === 1;
+                var isCancelado = item.status === 'Cancelado' || item.status === 2;
+
+                /* Botão Pagar: visível apenas quando Aberto */
+                var btnPagar = (!isPago && !isCancelado)
+                    ? '<button class="btn-icon pay" title="Pagar" onclick="pagarLancamento(' + item.id + ', \'' + escapeHtml(item.descricao) + '\')"><i class="bi bi-cash"></i></button>'
+                    : '';
+
+                /* Botão Cancelar: visível quando Aberto ou Pago (não quando já Cancelado) */
+                var btnCancelar = !isCancelado
+                    ? '<button class="btn-icon del" title="Cancelar" onclick="cancelarLancamento(' + item.id + ', \'' + escapeHtml(item.descricao) + '\')"><i class="bi bi-x-circle"></i></button>'
+                    : '';
+
                 rows +=
                     '<tr>' +
                     '<td>' + formatDate(item.dataLancamento) + '</td>' +
@@ -1220,9 +1239,9 @@
                     '<td><span class="badge-status ' + st.cls + '">' + st.lbl + '</span></td>' +
                     '<td class="text-center">' +
                     '<div class="d-flex gap-1 justify-content-center">' +
-                    '<button class="btn-icon edit bg-primary text-white" title="Editar" onclick="editarLancamento(' + item.id + ')"><i class="bi bi-pencil"></i></button>' +
-                    '<button class="btn-icon success bg-success text-white"  title="Pagar" onclick="excluirLancamento(\'' + item.descricao + '\', ' + item.id + ')"><i class="bi bi-cash"></i></button>' +
-                    '<button class="btn-icon del bg-danger text-white"  title="Cancelar" onclick="excluirLancamento(\'' + item.descricao + '\', ' + item.id + ')"><i class="bi bi-x"></i></button>' +
+                    '<button class="btn-icon edit" title="Editar" onclick="editarLancamento(' + item.id + ')"><i class="bi bi-pencil"></i></button>' +
+                    btnPagar +
+                    btnCancelar +
                     '</div></td>' +
                     '</tr>';
             }
@@ -1231,17 +1250,23 @@
 
         /* ── Atualizar KPIs ────────────────────────────────────────── */
         function updateKPIs(data) {
-            var creditos = data.filter(function (i) { return isCredito(i.Tipo); });
-            var debitos = data.filter(function (i) { return !isCredito(i.Tipo); });
-            var totCred = creditos.reduce(function (s, i) { return s + (i.ValorCalculado || 0); }, 0);
-            var totDeb = debitos.reduce(function (s, i) { return s + (i.ValorCalculado || 0); }, 0);
+            /* Bug fix: propriedades são camelCase (item.tipo / item.valorCalculado),
+               não PascalCase (item.Tipo / item.ValorCalculado)                       */
+            var creditos = data.filter(function (i) { return isCredito(i.tipo); });
+            var debitos = data.filter(function (i) { return !isCredito(i.tipo); });
+            var totCred = creditos.reduce(function (s, i) { return s + (i.valorCalculado || 0); }, 0);
+            var totDeb = debitos.reduce(function (s, i) { return s + (i.valorCalculado || 0); }, 0);
             var saldo = totCred - totDeb;
 
-            document.getElementById('kpiTotal').textContent = formatCurrency(totCred + totDeb);
+            /* Card "Total dos Lançamentos": exibe saldo (créditos − débitos) */
+            document.getElementById('kpiTotal').textContent = formatCurrency(saldo);
+            document.getElementById('kpiTotal').className =
+                'kpi-value ' + (saldo >= 0 ? 'val-credit' : 'val-debit');
             document.getElementById('kpiTotalSub').innerHTML =
                 '<span class="badge-tipo badge-credito me-1">' + creditos.length + ' crédito' + (creditos.length !== 1 ? 's' : '') + '</span>' +
                 '<span class="badge-tipo badge-debito">' + debitos.length + ' débito' + (debitos.length !== 1 ? 's' : '') + '</span>';
 
+            /* Card "Saldo": mantém igual */
             var saldoEl = document.getElementById('kpiSaldo');
             var saldoIcon = document.querySelector('#kpiSaldoIcon .bi');
             saldoEl.textContent = formatCurrency(Math.abs(saldo));
@@ -1304,21 +1329,97 @@
             ).show();
         }
 
-        function excluirLancamento(descricao, id) {
+        /* ── Pagar lançamento ──────────────────────────────────────── */
+        function pagarLancamento(id, descricao) {
+            Swal.fire({
+                title: 'Confirmar pagamento',
+                html: 'Confirmar pagamento do lançamento <strong>' + escapeHtml(descricao) + '</strong>?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#16A34A',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: '<i class="bi bi-cash me-1"></i> Confirmar pagamento',
+                cancelButtonText: 'Voltar',
+                reverseButtons: true
+            }).then(function (result) {
+                if (!result.isConfirmed) return;
+
+                fetch(API_BASE + '/' + id + '/pagar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(function (response) {
+                        if (!response.ok) throw new Error('HTTP ' + response.status + ' — ' + response.statusText);
+                        return response.text();
+                    })
+                    .then(function () {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Pagamento confirmado!',
+                            text: 'O lançamento foi marcado como pago.',
+                            confirmButtonColor: '#2563EB',
+                            confirmButtonText: 'OK',
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                        pesquisar();
+                    })
+                    .catch(function (err) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro ao pagar',
+                            html: escapeHtml(err.message),
+                            confirmButtonColor: '#2563EB',
+                            confirmButtonText: 'Fechar'
+                        });
+                    });
+            });
+        }
+
+        /* ── Cancelar lançamento ───────────────────────────────────── */
+        function cancelarLancamento(id, descricao) {
             Swal.fire({
                 title: 'Confirmar cancelamento',
-                html: 'Deseja cancelar o lançamento <strong>' + descricao + '</strong>?<br><small class="text-muted">Esta ação não pode ser desfeita.</small>',
+                html: 'Deseja cancelar o lançamento <strong>' + escapeHtml(descricao) + '</strong>?<br><small class="text-muted">Esta ação não pode ser desfeita.</small>',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#DC2626',
                 cancelButtonColor: '#64748B',
-                confirmButtonText: '<i class="bi bi-trash3 me-1"></i>Sim, quero cancelar',
-                cancelButtonText: 'Não quero cancelar',
+                confirmButtonText: '<i class="bi bi-x-circle me-1"></i> Sim, cancelar',
+                cancelButtonText: 'Voltar',
                 reverseButtons: true
             }).then(function (result) {
-                if (result.isConfirmed) {
-                    console.log('[TODO] Excluir lançamento id:', id);
-                }
+                if (!result.isConfirmed) return;
+
+                fetch(API_BASE + '/' + id + '/cancelar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(function (response) {
+                        if (!response.ok) throw new Error('HTTP ' + response.status + ' — ' + response.statusText);
+                        return response.text();
+                    })
+                    .then(function () {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Lançamento cancelado!',
+                            text: 'O lançamento foi cancelado com sucesso.',
+                            confirmButtonColor: '#2563EB',
+                            confirmButtonText: 'OK',
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                        pesquisar();
+                    })
+                    .catch(function (err) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro ao cancelar',
+                            html: escapeHtml(err.message),
+                            confirmButtonColor: '#2563EB',
+                            confirmButtonText: 'Fechar'
+                        });
+                    });
             });
         }
 
@@ -1485,11 +1586,12 @@
 
             var dados = coletarDadosFormulario();
             var modoEdicao = editandoId !== null;
+            var url = modoEdicao ? API_BASE + '/' + editandoId : API_BASE;
             var method = modoEdicao ? 'PUT' : 'POST';
 
             setModalLoading(true);
 
-            fetch(API_BASE, {
+            fetch(url, {
                 method: method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dados)
