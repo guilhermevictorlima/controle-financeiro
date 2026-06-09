@@ -984,6 +984,7 @@
         var isLoading = false;
         var isSaving = false;
         var hadResults = false;
+        var editandoId = null;   /* null = modo cadastro | number = modo edição */
 
         /* ── flatpickr: data do lançamento ────────────────────────── */
         flatpickr('#cadDataLancamento', {
@@ -1252,19 +1253,67 @@
 
         /* ── Ações de linha ────────────────────────────────────────── */
         function editarLancamento(id) {
-            console.log('[TODO] Editar lançamento id:', id);
+            var item = currentResults.find(function (i) { return i.id === id; });
+            if (!item) return;
+
+            /* Marca modo edição */
+            editandoId = id;
+
+            /* Ajusta título e ícone do modal */
+            var labelEl = document.getElementById('modalCadastroLabel');
+            labelEl.innerHTML = '<i class="bi bi-pencil-square"></i> Editar Lançamento';
+
+            /* Ajusta texto do botão salvar */
+            document.getElementById('btnSalvarCadastro').innerHTML =
+                '<i class="bi bi-check-lg"></i> Salvar Alterações';
+
+            /* Preenche os campos */
+            document.getElementById('cadDescricao').value = item.descricao || '';
+
+            var tipoVal = (item.tipo === 'Credito' || item.tipo === 0) ? 'C' : 'D';
+            document.getElementById('cadTipo').value = tipoVal;
+
+            /* Dispara a lógica de exibir taxa/desconto */
+            onCadTipoChange();
+
+            /* Preenche taxa/desconto após onCadTipoChange (que limpa os campos) */
+            if (tipoVal === 'D') {
+                document.getElementById('cadTaxa').value =
+                    formatBrDecimal(item.percentualTaxa || 0);
+            } else {
+                document.getElementById('cadDesconto').value =
+                    formatBrDecimal(item.percentualDesconto || 0);
+            }
+
+            document.getElementById('cadValorOriginal').value =
+                formatBrDecimal(item.valorOriginal || 0);
+
+            /* Data via flatpickr */
+            var fp = document.querySelector('#cadDataLancamento')._flatpickr;
+            if (fp) {
+                var dataLanc = parseDotNetDate(item.dataLancamento);
+                if (dataLanc) fp.setDate(dataLanc, true);
+            }
+
+            /* Recalcula o valor calculado */
+            recalcularValor();
+
+            /* Abre o modal */
+            bootstrap.Modal.getOrCreateInstance(
+                document.getElementById('modalCadastro')
+            ).show();
         }
 
         function excluirLancamento(descricao, id) {
             Swal.fire({
-                title: 'Confirmar exclusão',
-                html: 'Deseja excluir o lançamento <strong>' + descricao + '</strong>?<br><small class="text-muted">Esta ação não pode ser desfeita.</small>',
+                title: 'Confirmar cancelamento',
+                html: 'Deseja cancelar o lançamento <strong>' + descricao + '</strong>?<br><small class="text-muted">Esta ação não pode ser desfeita.</small>',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#DC2626',
                 cancelButtonColor: '#64748B',
-                confirmButtonText: '<i class="bi bi-trash3 me-1"></i>Cancelar',
-                cancelButtonText: 'Cancelar',
+                confirmButtonText: '<i class="bi bi-trash3 me-1"></i>Sim, quero cancelar',
+                cancelButtonText: 'Não quero cancelar',
                 reverseButtons: true
             }).then(function (result) {
                 if (result.isConfirmed) {
@@ -1364,6 +1413,13 @@
 
         /* ── Reset do modal ────────────────────────────────────────── */
         function resetarFormCadastro() {
+            /* Volta ao modo cadastro */
+            editandoId = null;
+            document.getElementById('modalCadastroLabel').innerHTML =
+                '<i class="bi bi-plus-circle"></i> Cadastrar Lançamento';
+            document.getElementById('btnSalvarCadastro').innerHTML =
+                '<i class="bi bi-check-lg"></i> Salvar Lançamento';
+
             ['cadDescricao', 'cadValorOriginal', 'cadTaxa', 'cadDesconto', 'cadValorCalculado'].forEach(function (id) {
                 document.getElementById(id).value = '';
             });
@@ -1384,7 +1440,7 @@
                 ? fp.selectedDates[0].toISOString().split('T')[0]
                 : '';
 
-            return {
+            var dados = {
                 descricao: document.getElementById('cadDescricao').value.trim(),
                 tipo: document.getElementById('cadTipo').value === 'C' ? 'Credito' : 'Debito',
                 valorOriginal: parseBrDecimal(document.getElementById('cadValorOriginal').value),
@@ -1393,6 +1449,11 @@
                 valorCalculado: parseBrDecimal(document.getElementById('cadValorCalculado').value),
                 dataLancamento: dataISO
             };
+
+            /* Em modo edição inclui o id no payload (DTO exige) */
+            if (editandoId !== null) dados.id = editandoId;
+
+            return dados;
         }
 
         /* ── Controle de loading do modal ──────────────────────────── */
@@ -1418,30 +1479,35 @@
             if (isSaving) e.preventDefault();
         });
 
-        /* ── Salvar lançamento ─────────────────────────────────────── */
+        /* ── Salvar lançamento (cadastro ou edição) ────────────────── */
         function salvarLancamento() {
             if (!validarFormCadastro()) return;
 
             var dados = coletarDadosFormulario();
+            var modoEdicao = editandoId !== null;
+            var method = modoEdicao ? 'PUT' : 'POST';
+
             setModalLoading(true);
 
             fetch(API_BASE, {
-                method: 'POST',
+                method: method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dados)
             })
                 .then(function (response) {
                     if (!response.ok) throw new Error('HTTP ' + response.status + ' — ' + response.statusText);
-                    return response.text(); /* 200 OK sem body */
+                    return response.text();
                 })
                 .then(function () {
-                    setModalLoading(false)
+                    setModalLoading(false);
                     bootstrap.Modal.getInstance(document.getElementById('modalCadastro')).hide();
                     setTimeout(function () {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Lançamento cadastrado!',
-                            text: 'O lançamento foi salvo com sucesso.',
+                            title: modoEdicao ? 'Lançamento atualizado!' : 'Lançamento cadastrado!',
+                            text: modoEdicao
+                                ? 'As alterações foram salvas com sucesso.'
+                                : 'O lançamento foi salvo com sucesso.',
                             confirmButtonColor: '#2563EB',
                             confirmButtonText: 'OK',
                             timer: 3000,
@@ -1454,7 +1520,7 @@
                     setModalLoading(false);
                     Swal.fire({
                         icon: 'error',
-                        title: 'Erro ao salvar',
+                        title: modoEdicao ? 'Erro ao atualizar' : 'Erro ao salvar',
                         html: escapeHtml(err.message),
                         confirmButtonColor: '#2563EB',
                         confirmButtonText: 'Fechar'
@@ -1536,7 +1602,9 @@
             bootstrap.Modal.getInstance(document.getElementById('modalExportacao')).hide();
         });
 
+        /* ── FIX 2: Pesquisa automática ao entrar na tela ───────────── */
         pesquisar();
+
     </script>
 
 </body>
