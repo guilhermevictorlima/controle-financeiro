@@ -27,7 +27,7 @@ insert into lancamento_financeiro (
 )
 values (
     'Pagamento de Fornecedor',
-    'DEBITO',
+    'Debito',
     20000,
     5,
     0,
@@ -51,7 +51,7 @@ insert into lancamento_financeiro (
 )
 values (
     'Retorno Investimento',
-    'CREDITO',
+    'Credito',
     9500,
     0,
     1.5,
@@ -60,3 +60,4 @@ values (
     '2026-06-20',
     '2026-06'
 );
+
