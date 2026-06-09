@@ -139,7 +139,10 @@
 
             Dictionary<string, object> parameters = new ()
             {
-                { "@id",             id },
+                { "@id",             id                                         },
+                { "@status",            StatusLancamento.Cancelado.ToString()   },
+                { "@data_cancelamento",    DateTime.Now                         },
+
             };
 
 
@@ -157,7 +160,9 @@
 
             Dictionary<string, object> parameters = new ()
             {
-                { "@id",             id },
+                { "@id",                id                                  },
+                { "@status",            StatusLancamento.Pago.ToString()    },
+                { "@data_pagamento",    DateTime.Now                        },
             };
 
             this.Persist(sql, parameters);
