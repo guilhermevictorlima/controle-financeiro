@@ -4,7 +4,7 @@
 
     public abstract class RepositoryBase<TEntity>
     {
-        private readonly string connectionString = "Server=localhost;Database=controle_financeiro;User Id=sa;Password=banana123;TrustServerCertificate=True;";
+        private readonly string connectionString = "Server=localhost;Database={DATABASE};User Id={USER};Password={PASSWORD};TrustServerCertificate=True;";
 
         public List<TEntity> List(string sql, Dictionary<string, object>? parameters = null)
         {
