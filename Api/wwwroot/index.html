@@ -673,7 +673,7 @@
                         <i class="bi bi-wallet2"></i>
                     </div>
                     <div>
-                        <div class="kpi-label">Saldo do Período</div>
+                        <div class="kpi-label">Total dos Lançamentos</div>
                         <div class="kpi-value" id="kpiTotal">R$ 0,00</div>
                         <div class="kpi-sub" id="kpiTotalSub">
                             <span class="badge-tipo badge-credito me-1">0 créditos</span>
@@ -944,13 +944,6 @@
                                 <i class="bi bi-filetype-csv me-1"></i> CSV
                             </label>
                         </div>
-                        <div class="col-auto">
-                            <input type="radio" class="btn-check" name="expFormato"
-                                   id="expPdf" value="pdf" autocomplete="off" />
-                            <label class="btn btn-sm btn-outline-secondary" for="expPdf">
-                                <i class="bi bi-file-earmark-pdf me-1"></i> PDF
-                            </label>
-                        </div>
                     </div>
                 </div>
 
@@ -1086,10 +1079,15 @@
             var st = STATUS_MAP[item.status] || { cls: 'badge-aberto', lbl: String(item.status) };
             var isPago = item.status === 'Pago' || item.status === 1;
             var isCancelado = item.status === 'Cancelado' || item.status === 2;
+
+            var btnEditar = isPago || isCancelado
+                ? ''
+                : '<button class="btn-icon edit" title="Editar" onclick="editarLancamento(' + item.id + ')"><i class="bi bi-pencil"></i></button>';
+
             var btnPagar = isPago || isCancelado
                 ? ''
                 : '<button class="btn-icon pay"    title="Pagar"    onclick="pagarLancamento(' + item.id + ')"><i class="bi bi-check-circle"></i></button>';
-            var btnCancelar = isCancelado
+            var btnCancelar = isPago || isCancelado
                 ? ''
                 : '<button class="btn-icon cancel" title="Cancelar" onclick="cancelarLancamento(' + item.id + ')"><i class="bi bi-x-circle"></i></button>';
 
@@ -1105,7 +1103,7 @@
                 '<td><span class="badge-status ' + st.cls + '">' + st.lbl + '</span></td>' +
                 '<td class="text-center">' +
                 '<div class="d-flex gap-1 justify-content-center">' +
-                '<button class="btn-icon edit" title="Editar" onclick="editarLancamento(' + item.id + ')"><i class="bi bi-pencil"></i></button>' +
+                btnEditar +
                 btnPagar +
                 btnCancelar +
                 '</div></td>';
@@ -1217,12 +1215,17 @@
                 var isCancelado = item.status === 'Cancelado' || item.status === 2;
 
                 /* Botão Pagar: visível apenas quando Aberto */
+                var btnEditar = (!isPago && !isCancelado)
+                    ? '<button class="btn-icon edit" title="Editar" onclick="editarLancamento(' + item.id + ')"><i class="bi bi-pencil"></i></button>'
+                    : '';
+
+                /* Botão Pagar: visível apenas quando Aberto */
                 var btnPagar = (!isPago && !isCancelado)
                     ? '<button class="btn-icon pay" title="Pagar" onclick="pagarLancamento(' + item.id + ', \'' + escapeHtml(item.descricao) + '\')"><i class="bi bi-cash"></i></button>'
                     : '';
 
-                /* Botão Cancelar: visível quando Aberto ou Pago (não quando já Cancelado) */
-                var btnCancelar = !isCancelado
+                /* Botão Cancelar: visível quando Aberto */
+                var btnCancelar = (!isPago && !isCancelado)
                     ? '<button class="btn-icon del" title="Cancelar" onclick="cancelarLancamento(' + item.id + ', \'' + escapeHtml(item.descricao) + '\')"><i class="bi bi-x-circle"></i></button>'
                     : '';
 
@@ -1239,7 +1242,7 @@
                     '<td><span class="badge-status ' + st.cls + '">' + st.lbl + '</span></td>' +
                     '<td class="text-center">' +
                     '<div class="d-flex gap-1 justify-content-center">' +
-                    '<button class="btn-icon edit" title="Editar" onclick="editarLancamento(' + item.id + ')"><i class="bi bi-pencil"></i></button>' +
+                    btnEditar +
                     btnPagar +
                     btnCancelar +
                     '</div></td>' +
@@ -1345,7 +1348,7 @@
                 if (!result.isConfirmed) return;
 
                 fetch(API_BASE + '/' + id + '/pagar', {
-                    method: 'POST',
+                    method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' }
                 })
                     .then(function (response) {
@@ -1392,7 +1395,7 @@
                 if (!result.isConfirmed) return;
 
                 fetch(API_BASE + '/' + id + '/cancelar', {
-                    method: 'POST',
+                    method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' }
                 })
                     .then(function (response) {
