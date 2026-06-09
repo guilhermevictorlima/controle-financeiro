@@ -1,14 +1,10 @@
-﻿using Business.Exceptions;
-using Data.Core.DTOs;
-using Data.Models.Enums;
-using Data.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-
-namespace Business.Validators.Abstracts
+﻿namespace Business.Validators.Abstracts
 {
+    using Business.Exceptions;
+    using Data.Core.DTOs;
+    using Data.Models.Enums;
+    using Data.Repositories.Interfaces;
+
     internal abstract class CriacaoEdicaoLancamentoFinanceiroValidator(ILancamentoFinanceiroRepository Repository) : LancamentoFinanceiroValidator(Repository)
     {
         protected void AdicionarValidacoesDeIntegridadeBase(IDadosLancamentoFinanceiro dto, Dictionary<string, bool> violacoes)
@@ -17,26 +13,12 @@ namespace Business.Validators.Abstracts
             violacoes.Add("A descrição não pode ultrapassar 250 caracteres.", dto.Descricao?.Length > 250);
             violacoes.Add("O valor original é obrigatório e deve ser maior que zero.", dto.ValorOriginal <= 0);
             violacoes.Add("O valor calculado é obrigatório e deve ser maior que zero.", dto.ValorCalculado <= 0);
-            violacoes.Add("A competência é obrigatória.", dto.Competencia == default);
             violacoes.Add("A data de lançamento é obrigatória.", dto.DataLancamento == default);
         }
 
         protected void AdicionarValidacoesDeNegocioBase(IDadosLancamentoFinanceiro dto, Dictionary<string, bool> violacoes)
         {
-            this.AdicionarValidacaoDataLancamentoCompativelComCompetencia(dto, violacoes);
             this.AdicionarValidacaoValorCalculado(dto, violacoes);
-        }
-
-        protected void AdicionarValidacaoDataLancamentoCompativelComCompetencia(IDadosLancamentoFinanceiro dto, Dictionary<string, bool> violacoes)
-        {
-            DateTime competenciaData = DateTime.ParseExact(dto.Competencia.ToString(), "yyyy-MM", CultureInfo.InvariantCulture);
-
-            bool incompativel = dto.DataLancamento.Year != competenciaData.Year
-                             || dto.DataLancamento.Month != competenciaData.Month;
-
-            violacoes.Add(
-                $"A data de lançamento {dto.DataLancamento:dd/MM/yyyy} não é compatível com a competência '{dto.Competencia}'.",
-                incompativel);
         }
 
         protected void AdicionarValidacaoValorCalculado(IDadosLancamentoFinanceiro dto, Dictionary<string, bool> violacoes)

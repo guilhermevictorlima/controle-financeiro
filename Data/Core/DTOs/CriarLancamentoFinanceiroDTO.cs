@@ -10,6 +10,8 @@
         decimal PercentualTaxa,
         decimal PercentualDesconto,
         decimal ValorCalculado,
-        DateTime DataLancamento,
-        Competencia Competencia) : IDadosLancamentoFinanceiro;
+        DateTime DataLancamento) : IDadosLancamentoFinanceiro
+    {
+        public Competencia Competencia => new ($"{DataLancamento:yyyy-MM}");
+    }
 }
