@@ -9,7 +9,7 @@
             return tipo switch
             {
                 TipoExportacao.Csv => new CsvLancamentoFinanceiroExporter(),
-                TipoExportacao.Excel => new ExcelLancamentoFinanceiroExporter(),
+                TipoExportacao.Xlsx => new ExcelLancamentoFinanceiroExporter(),
                 _ => throw new ArgumentOutOfRangeException(nameof(tipo), "Tipo de exportação não suportado."),
             };
         }

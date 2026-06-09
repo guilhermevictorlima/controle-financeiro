@@ -3,6 +3,6 @@
     public enum TipoExportacao
     {
         Csv,
-        Excel,
+        Xlsx,
     }
 }
