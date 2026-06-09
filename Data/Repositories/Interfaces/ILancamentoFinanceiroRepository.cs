@@ -9,6 +9,10 @@
 
         LancamentoFinanceiro? Update(EditarLancamentoFinanceiroDTO dto);
 
+        void Cancelar(int id);
+
+        void Pagar(int id);
+
         bool IsLancamentoDuplicado(VerificarLancamentoDuplicadoDTO dto);
     }
 }

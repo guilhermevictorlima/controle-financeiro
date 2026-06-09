@@ -98,6 +98,44 @@
             return default;
         }
 
+        public void Cancelar(int id)
+        {
+            string sql = """
+                update lancamento_financeiro set
+                    status            = @status,
+                    data_cancelamento = @data_cancelamento
+                where id = @id
+            """;
+
+            Dictionary<string, object> parameters = new()
+            {
+                { "@id",                id                                      },
+                { "@status",            StatusLancamento.Cancelado.ToString()   },
+                { "@data_cancelamento", DateTime.Now                            },
+            };
+
+            this.Persist(sql, parameters);
+        }
+
+        public void Pagar(int id)
+        {
+            string sql = """
+                update lancamento_financeiro set
+                    status         = @status,
+                    data_pagamento = @data_pagamento
+                where id = @id
+            """;
+
+            Dictionary<string, object> parameters = new()
+            {
+                { "@id",             id                                 },
+                { "@status",         StatusLancamento.Pago.ToString()   },
+                { "@data_pagamento", DateTime.Now                       },
+            };
+
+            this.Persist(sql, parameters);
+        }
+
         public bool IsLancamentoDuplicado(VerificarLancamentoDuplicadoDTO dto)
         {
             return this.List($"""

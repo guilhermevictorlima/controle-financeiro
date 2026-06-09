@@ -5,7 +5,7 @@
     using Data.Repositories.Interfaces;
 
     internal class CadastroLancamentoFinanceiroValidator(ILancamentoFinanceiroRepository repository)
-        : LancamentoFinanceiroValidator(repository)
+        : CriacaoEdicaoLancamentoFinanceiroValidator(repository)
     {
         internal void Validar(CriarLancamentoFinanceiroDTO dto)
         {
