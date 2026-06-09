@@ -6,32 +6,55 @@
     using Data.Models.Enums;
     using Data.Repositories.Interfaces;
     using Microsoft.Data.SqlClient;
+    using System.Text;
 
     public class LancamentoFinanceiroRepository : RepositoryBase<LancamentoFinanceiro>, ILancamentoFinanceiroRepository
     {
 
-        public IReadOnlyList<LancamentoFinanceiroResponseDTO> ListarPorCompetencia(Competencia competencia)
+        public IReadOnlyList<LancamentoFinanceiroResponseDTO> Listar()
         {
-            return this.List($"""
+            return this.List("""
                 select *
                 from lancamento_financeiro
-                where competencia = '{competencia}'
                 order by data_lancamento
             """).Select(LancamentoFinanceiroResponseDTO.FromEntity)
                 .ToList()
                 .AsReadOnly();
         }
 
-        public LancamentoFinanceiro? Get(int id)
+        public IReadOnlyList<LancamentoFinanceiroResponseDTO> ListarPorCompetencia(Competencia competencia)
         {
-            return this.Get($"""
+            Dictionary<string, object> parameters = new()
+            {
+                { "@competencia", competencia.ToString() },
+            };
+
+
+            return this.List("""
                 select *
                 from lancamento_financeiro
-                where id = {id}
-                """);
+                where competencia = @competencia
+                order by data_lancamento
+            """, parameters).Select(LancamentoFinanceiroResponseDTO.FromEntity)
+                .ToList()
+                .AsReadOnly();
         }
 
-        public LancamentoFinanceiro Save(CriarLancamentoFinanceiroDTO dto)
+        public LancamentoFinanceiro? Get(int id)
+        {
+            Dictionary<string, object> parameters = new ()
+            {
+                { "@id", id },
+            };
+
+            return this.Get("""
+                select *
+                from lancamento_financeiro
+                where id = @id
+                """, parameters);
+        }
+
+        public void Save(CriarLancamentoFinanceiroDTO dto)
         {
             string sql = """
                 insert into lancamento_financeiro (
@@ -72,12 +95,9 @@
             };
 
             this.Persist(sql, parameters);
-
-            // return this.GetLastInserted();
-            return default;
         }
 
-        public LancamentoFinanceiro Update(EditarLancamentoFinanceiroDTO dto)
+        public void Update(EditarLancamentoFinanceiroDTO dto)
         {
             string sql = """
                 update lancamento_financeiro set
@@ -106,9 +126,6 @@
             };
 
             this.Persist(sql, parameters);
-
-            // return this.GetLastInserted();
-            return default;
         }
 
         public void Cancelar(int id)
@@ -120,12 +137,11 @@
                 where id = @id
             """;
 
-            Dictionary<string, object> parameters = new()
+            Dictionary<string, object> parameters = new ()
             {
-                { "@id",                id                                      },
-                { "@status",            StatusLancamento.Cancelado.ToString()   },
-                { "@data_cancelamento", DateTime.Now                            },
+                { "@id",             id },
             };
+
 
             this.Persist(sql, parameters);
         }
@@ -139,11 +155,9 @@
                 where id = @id
             """;
 
-            Dictionary<string, object> parameters = new()
+            Dictionary<string, object> parameters = new ()
             {
-                { "@id",             id                                 },
-                { "@status",         StatusLancamento.Pago.ToString()   },
-                { "@data_pagamento", DateTime.Now                       },
+                { "@id",             id },
             };
 
             this.Persist(sql, parameters);
@@ -151,13 +165,21 @@
 
         public bool IsLancamentoDuplicado(VerificarLancamentoDuplicadoDTO dto)
         {
-            return this.List($"""
+            Dictionary<string, object> parameters = new ()
+            {
+                { "@descricao",         dto.Descricao               },
+                { "@tipo",              dto.Tipo.ToString()         },
+                { "@competencia",       dto.Competencia.ToString()  },
+            };
+
+            return this.List(
+            """
                 select count(1)
                 from lancamento_financeiro
-                where descricao = {dto.Descricao}
-                  and tipo = {dto.Tipo.ToString()}
-                  and competencia = {dto.Competencia.ToString()}
-                """).Count != 0;
+                where descricao = @descricao
+                  and tipo = @tipo
+                  and competencia = @competencia
+                """, parameters).Count != 0;
         }
 
         internal override LancamentoFinanceiro EntityResultMapper(SqlDataReader reader)

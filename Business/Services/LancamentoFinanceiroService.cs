@@ -12,30 +12,33 @@
         private static readonly EdicaoLancamentoFinanceiroValidator EdicaoValidator = new(Repository);
         private static readonly AlteracaoStatusLancamentoValidator AlteracaoStatusValidator = new(Repository);
 
-        public LancamentoFinanceiroResponseDTO CadastrarLancamento(CriarLancamentoFinanceiroDTO dto)
+        public void CadastrarLancamento(CriarLancamentoFinanceiroDTO dto)
         {
             CadastroValidator.Validar(dto);
-            return LancamentoFinanceiroResponseDTO.FromEntity(Repository.Save(dto));
+            Repository.Save(dto);
         }
 
-        public LancamentoFinanceiroResponseDTO EditarLancamento(EditarLancamentoFinanceiroDTO dto)
+        public void EditarLancamento(EditarLancamentoFinanceiroDTO dto)
         {
             EdicaoValidator.Validar(dto);
-            return LancamentoFinanceiroResponseDTO.FromEntity(Repository.Update(dto));
+            Repository.Update(dto);
         }
 
-        public LancamentoFinanceiroResponseDTO CancelarLancamento(int id)
+        public void CancelarLancamento(int id)
         {
             AlteracaoStatusValidator.ValidarCancelamento(id);
             Repository.Cancelar(id);
-            return LancamentoFinanceiroResponseDTO.FromEntity(Repository.Get(id)!);
         }
 
-        public LancamentoFinanceiroResponseDTO PagarLancamento(int id)
+        public void PagarLancamento(int id)
         {
             AlteracaoStatusValidator.ValidarPagamento(id);
             Repository.Pagar(id);
-            return LancamentoFinanceiroResponseDTO.FromEntity(Repository.Get(id)!);
+        }
+
+        public List<LancamentoFinanceiroResponseDTO> Listar()
+        {
+            return Repository.Listar().ToList();
         }
 
         public ArquivoExportadoDTO ExportarLancamentos(ExportarLancamentosDTO dto)

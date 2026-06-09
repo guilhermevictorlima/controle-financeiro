@@ -6,14 +6,14 @@
     {
         private readonly string connectionString = "Server=localhost;Database=controle_financeiro;User Id=sa;Password=banana123;TrustServerCertificate=True;";
 
-        public List<TEntity> List(string sql)
+        public List<TEntity> List(string sql, Dictionary<string, object>? parameters = null)
         {
-            return this.ExecuteQuery(sql, this.EntityResultListMapper) ?? [];
+            return this.ExecuteQuery(sql, this.EntityResultListMapper, parameters) ?? [];
         }
 
-        public virtual TEntity? Get(string sql)
+        public virtual TEntity? Get(string sql, Dictionary<string, object> parameters)
         {
-            return this.ExecuteQuery(sql, this.EntityResultMapper);
+            return this.ExecuteQuery(sql, this.EntityResultMapper, parameters);
         }
 
         public void Persist(string sql, Dictionary<string, object> parameters)
@@ -22,11 +22,11 @@
             connection.Open();
 
             using SqlCommand command = new (sql, connection);
-            EntityPersistenceMapper(command, parameters);
+            QueryParametersMapper(command, parameters);
             command.ExecuteNonQuery();
         }
 
-        internal static void EntityPersistenceMapper(SqlCommand command, Dictionary<string, object> parameters)
+        internal static void QueryParametersMapper(SqlCommand command, Dictionary<string, object> parameters)
         {
             foreach (var param in parameters)
             {
@@ -48,12 +48,18 @@
             return result;
         }
 
-        private TMappedData? ExecuteQuery<TMappedData>(string sql, Func<SqlDataReader, TMappedData> dataMapper)
+        private TMappedData? ExecuteQuery<TMappedData>(string sql, Func<SqlDataReader, TMappedData> dataMapper, Dictionary<string, object>? parameters)
         {
             using SqlConnection connection = new (this.connectionString);
             connection.Open();
 
             using SqlCommand command = new (sql, connection);
+
+            if (parameters != null)
+            {
+                QueryParametersMapper(command, parameters);
+            }
+
             using SqlDataReader reader = command.ExecuteReader();
 
             bool hasData = reader.Read();

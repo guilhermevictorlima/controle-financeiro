@@ -6,16 +6,18 @@
 
     public interface ILancamentoFinanceiroRepository
     {
-        LancamentoFinanceiro? Get(int id); // TODO refactor
+        IReadOnlyList<LancamentoFinanceiroResponseDTO> Listar();
+     
+        IReadOnlyList<LancamentoFinanceiroResponseDTO> ListarPorCompetencia(Competencia competencia);
 
-        LancamentoFinanceiro? Update(EditarLancamentoFinanceiroDTO dto);
+        LancamentoFinanceiro? Get(int id);
+
+        void Update(EditarLancamentoFinanceiroDTO dto);
 
         void Cancelar(int id);
 
         void Pagar(int id);
 
         bool IsLancamentoDuplicado(VerificarLancamentoDuplicadoDTO dto);
-
-        IReadOnlyList<LancamentoFinanceiroResponseDTO> ListarPorCompetencia(Competencia competencia);
     }
 }
