@@ -1,5 +1,6 @@
 ﻿namespace Business.Services
 {
+    using Business.Exporters;
     using Business.Validators;
     using Data.Core.DTOs;
     using Data.Repositories;
@@ -35,6 +36,14 @@
             AlteracaoStatusValidator.ValidarPagamento(id);
             Repository.Pagar(id);
             return LancamentoFinanceiroResponseDTO.FromEntity(Repository.Get(id)!);
+        }
+
+        public ArquivoExportadoDTO ExportarLancamentos(ExportarLancamentosDTO dto)
+        {
+            IReadOnlyList<LancamentoFinanceiroResponseDTO> registros = Repository.ListarPorCompetencia(dto.Competencia);
+            
+            return LancamentoFinanceiroExporterFactory.Criar(dto.TipoExportacao)
+                    .Exportar(registros, dto.Competencia);
         }
 
     }

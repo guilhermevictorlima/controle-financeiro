@@ -9,6 +9,19 @@
 
     public class LancamentoFinanceiroRepository : RepositoryBase<LancamentoFinanceiro>, ILancamentoFinanceiroRepository
     {
+
+        public IReadOnlyList<LancamentoFinanceiroResponseDTO> ListarPorCompetencia(Competencia competencia)
+        {
+            return this.List($"""
+                select *
+                from lancamento_financeiro
+                where competencia = '{competencia}'
+                order by data_lancamento
+            """).Select(LancamentoFinanceiroResponseDTO.FromEntity)
+                .ToList()
+                .AsReadOnly();
+        }
+
         public LancamentoFinanceiro? Get(int id)
         {
             return this.Get($"""

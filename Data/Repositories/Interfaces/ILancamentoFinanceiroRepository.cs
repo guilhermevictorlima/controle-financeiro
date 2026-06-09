@@ -1,6 +1,7 @@
 ﻿namespace Data.Repositories.Interfaces
 {
     using Data.Core.DTOs;
+    using Data.Core.ValueObjects;
     using Data.Models.Entities;
 
     public interface ILancamentoFinanceiroRepository
@@ -14,5 +15,7 @@
         void Pagar(int id);
 
         bool IsLancamentoDuplicado(VerificarLancamentoDuplicadoDTO dto);
+
+        IReadOnlyList<LancamentoFinanceiroResponseDTO> ListarPorCompetencia(Competencia competencia);
     }
 }
