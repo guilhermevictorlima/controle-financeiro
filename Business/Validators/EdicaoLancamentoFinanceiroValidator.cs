@@ -1,5 +1,6 @@
 ﻿namespace Business.Validators
 {
+    using Business.Validators.Abstracts;
     using Data.Core.DTOs;
     using Data.Models.Entities;
     using Data.Models.Enums;
