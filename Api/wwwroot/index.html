@@ -4,22 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lançamentos Financeiros</title>
-
-    <!-- Bootstrap 5 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-    <!-- flatpickr -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
-    <!-- flatpickr monthSelect plugin -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css" />
-    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
     <style>
-        /* ── Tokens ── */
         :root {
             --navy: #1C2D4F;
             --navy-light: #253d6b;
@@ -35,7 +28,6 @@
             --mono: 'Courier New', Courier, monospace;
         }
 
-        /* ── Base ── */
         *, *::before, *::after {
             box-sizing: border-box;
         }
@@ -48,7 +40,6 @@
             min-height: 100vh;
         }
 
-        /* ── Header / Topbar ── */
         .topbar {
             background: var(--navy);
             color: #fff;
@@ -82,7 +73,6 @@
             color: #94A3B8;
         }
 
-        /* ── Page title bar ── */
         .page-header {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -108,14 +98,12 @@
                 color: var(--muted);
             }
 
-        /* ── Layout ── */
         .main-content {
             padding: 1.5rem;
             max-width: 1600px;
             margin: 0 auto;
         }
 
-        /* ── Cards genéricos ── */
         .card {
             border: 1px solid var(--border);
             border-radius: 10px;
@@ -141,7 +129,6 @@
                 font-size: .875rem;
             }
 
-        /* ── Labels de formulário ── */
         .filter-label {
             font-size: .75rem;
             font-weight: 600;
@@ -168,7 +155,6 @@
                 cursor: not-allowed;
             }
 
-        /* ── Botões ── */
         .btn-primary-custom {
             background: var(--blue);
             border: none;
@@ -236,7 +222,6 @@
             pointer-events: none;
         }
 
-        /* ── KPI Cards ── */
         .kpi-card {
             border-radius: 10px;
             border: 1px solid var(--border);
@@ -313,7 +298,6 @@
             margin-top: .3rem;
         }
 
-        /* ── Tabela ── */
         .table-card .card-body {
             padding: 0;
         }
@@ -539,7 +523,6 @@
             color: var(--muted);
         }
 
-        /* ── Modais ── */
         .modal-header-custom {
             background: var(--navy);
             color: #fff;
@@ -581,7 +564,6 @@
                 margin-top: 0;
             }
 
-        /* ── flatpickr monthSelect override ── */
         .flatpickr-monthSelect-months {
             margin: .5rem 0;
         }
@@ -595,7 +577,6 @@
                 background: var(--blue) !important;
             }
 
-        /* ── Responsivo ── */
         @media (max-width: 768px) {
             .main-content {
                 padding: 1rem;
@@ -609,9 +590,6 @@
 </head>
 <body>
 
-    <!-- ════════════════════════════════════
-         TOPBAR
-    ════════════════════════════════════ -->
     <header class="topbar">
         <div class="topbar-brand">
             <i class="bi bi-bar-chart-fill"></i>
@@ -620,9 +598,6 @@
         <span class="topbar-meta">Gestão Financeira</span>
     </header>
 
-    <!-- ════════════════════════════════════
-         PAGE HEADER / BREADCRUMB
-    ════════════════════════════════════ -->
     <div class="page-header">
         <i class="bi bi-receipt text-secondary" style="font-size:.95rem;"></i>
         <h1>Lançamentos</h1>
@@ -637,15 +612,10 @@
         </nav>
     </div>
 
-    <!-- ════════════════════════════════════
-         CONTEÚDO PRINCIPAL
-    ════════════════════════════════════ -->
     <main class="main-content">
 
-        <!-- ── AÇÕES + KPI ── -->
         <div class="row g-3 mb-3 align-items-stretch">
 
-            <!-- Ações -->
             <div class="col-12 col-lg-4">
                 <div class="d-flex gap-2 flex-wrap h-100 align-items-start pt-1">
                     <button type="button" class="btn-primary-custom" id="btnPesquisar">
@@ -666,7 +636,6 @@
                 </div>
             </div>
 
-            <!-- KPI: Total dos Lançamentos -->
             <div class="col-12 col-sm-6 col-lg-4">
                 <div class="kpi-card kpi-total h-100">
                     <div class="kpi-icon">
@@ -683,7 +652,6 @@
                 </div>
             </div>
 
-            <!-- KPI: Saldo -->
             <div class="col-12 col-sm-6 col-lg-4">
                 <div class="kpi-card kpi-saldo h-100">
                     <div class="kpi-icon" id="kpiSaldoIcon">
@@ -692,14 +660,13 @@
                     <div>
                         <div class="kpi-label">Saldo</div>
                         <div class="kpi-value" id="kpiSaldo">R$ 0,00</div>
-                        <div class="kpi-sub">Créditos menos Débitos do período</div>
+                        <div class="kpi-sub" id="kpiSaldoSub">Créditos menos Débitos dos registros pagos</div>
                     </div>
                 </div>
             </div>
 
         </div>
 
-        <!-- ── TABELA ── -->
         <div class="card table-card">
             <div class="card-header-custom" style="justify-content: space-between;">
                 <span><i class="bi bi-table"></i> Listagem de Lançamentos</span>
@@ -707,19 +674,14 @@
             </div>
             <div class="card-body">
                 <div class="table-wrapper">
-                    <!-- Overlay de carregamento -->
                     <div class="table-overlay" id="tblLoadingOverlay">
                         <div class="d-flex flex-column align-items-center gap-2">
-                            <div class="spinner-border text-primary"
-                                 role="status" style="width:2.25rem;height:2.25rem;">
+                            <div class="spinner-border text-primary" role="status" style="width:2.25rem;height:2.25rem;">
                                 <span class="visually-hidden">Carregando...</span>
                             </div>
-                            <span style="font-size:.8125rem;color:var(--muted);">
-                                Buscando lançamentos...
-                            </span>
+                            <span style="font-size:.8125rem;color:var(--muted);">Buscando lançamentos...</span>
                         </div>
                     </div>
-
                     <table class="data-table" id="tblLancamentos">
                         <thead>
                             <tr>
@@ -753,21 +715,13 @@
                     </table>
                 </div>
             </div>
-
-            <!-- Rodapé -->
             <div class="table-footer">
                 <span id="lblRegistros">Exibindo 0 de 0 registros</span>
                 <nav>
                     <ul class="pagination pagination-sm mb-0" id="paginacao">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#">Anterior</a>
-                        </li>
-                        <li class="page-item active">
-                            <a class="page-link" href="#">1</a>
-                        </li>
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#">Próximo</a>
-                        </li>
+                        <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item disabled"><a class="page-link" href="#">Próximo</a></li>
                     </ul>
                 </nav>
             </div>
@@ -775,10 +729,6 @@
 
     </main>
 
-
-    <!-- ════════════════════════════════════
-         MODAL: CADASTRO DE LANÇAMENTO
-    ════════════════════════════════════ -->
     <div class="modal fade" id="modalCadastro" tabindex="-1"
          aria-labelledby="modalCadastroLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -789,13 +739,11 @@
                         <i class="bi bi-plus-circle"></i>
                         Cadastrar Lançamento
                     </span>
-                    <button type="button" class="btn-close"
-                            data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
 
                 <div class="modal-body p-4">
 
-                    <!-- Informações Gerais -->
                     <p class="modal-section-label">Informações Gerais</p>
                     <div class="row g-3">
                         <div class="col-12 col-md-8">
@@ -804,9 +752,7 @@
                             </label>
                             <input type="text" id="cadDescricao" class="form-control"
                                    placeholder="Ex.: Pagamento de fornecedor" maxlength="250" />
-                            <div class="invalid-feedback" id="errDescricao">
-                                Informe a descrição do lançamento.
-                            </div>
+                            <div class="invalid-feedback" id="errDescricao">Informe a descrição do lançamento.</div>
                         </div>
                         <div class="col-12 col-md-4">
                             <label class="filter-label" for="cadTipo">
@@ -817,42 +763,33 @@
                                 <option value="C">Crédito</option>
                                 <option value="D">Débito</option>
                             </select>
-                            <div class="invalid-feedback" id="errTipo">
-                                Selecione o tipo de lançamento.
-                            </div>
+                            <div class="invalid-feedback" id="errTipo">Selecione o tipo de lançamento.</div>
                         </div>
                     </div>
 
-                    <!-- Data -->
                     <p class="modal-section-label">Data</p>
                     <div class="row g-3">
                         <div class="col-12 col-md-6">
                             <label class="filter-label" for="cadDataLancamento">
                                 Data do Lançamento <span class="text-danger">*</span>
                             </label>
-                            <input type="text" id="cadDataLancamento"
-                                   class="form-control" placeholder="dd/mm/aaaa" />
-                            <div class="invalid-feedback" id="errDataLancamento">
-                                Informe a data do lançamento.
-                            </div>
+                            <input type="text" id="cadDataLancamento" class="form-control" placeholder="dd/mm/aaaa" />
+                            <div class="invalid-feedback" id="errDataLancamento">Informe a data do lançamento.</div>
                         </div>
                     </div>
 
-                    <!-- Valores -->
                     <p class="modal-section-label">Valores</p>
                     <div class="row g-3">
-
                         <div class="col-12 col-md-4">
                             <label class="filter-label" for="cadValorOriginal">
                                 Valor Original (R$) <span class="text-danger">*</span>
                             </label>
-                            <input type="text" id="cadValorOriginal" class="form-control"
+                            <input type="number" id="cadValorOriginal" class="form-control"
                                    placeholder="0,00" inputmode="decimal" />
                             <div class="invalid-feedback" id="errValorOriginal">
                                 Informe um valor original maior que zero.
                             </div>
                         </div>
-
                         <div class="col-12 col-md-4">
                             <div id="wrapTaxa" class="d-none">
                                 <label class="filter-label" for="cadTaxa">Taxa (%)</label>
@@ -865,11 +802,8 @@
                                        placeholder="0,00" inputmode="decimal" />
                             </div>
                         </div>
-
                         <div class="col-12 col-md-4">
-                            <label class="filter-label" for="cadValorCalculado">
-                                Valor Calculado (R$)
-                            </label>
+                            <label class="filter-label" for="cadValorCalculado">Valor Calculado (R$)</label>
                             <input type="text" id="cadValorCalculado" class="form-control"
                                    readonly tabindex="-1" placeholder="0,00"
                                    style="background:#F8FAFC; font-weight:600;" />
@@ -878,10 +812,10 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
 
-                <div class="modal-footer"
-                     style="border-top:1px solid var(--border); padding:.75rem 1.25rem;">
+                <div class="modal-footer" style="border-top:1px solid var(--border); padding:.75rem 1.25rem;">
                     <button type="button" class="btn-outline-custom" data-bs-dismiss="modal">
                         <i class="bi bi-x-lg"></i> Cancelar
                     </button>
@@ -893,10 +827,6 @@
         </div>
     </div>
 
-
-    <!-- ════════════════════════════════════
-         MODAL: EXPORTAÇÃO
-    ════════════════════════════════════ -->
     <div class="modal fade" id="modalExportacao" tabindex="-1"
          aria-labelledby="modalExportacaoLabel" aria-hidden="true">
         <div class="modal-dialog modal-md modal-dialog-centered">
@@ -907,13 +837,11 @@
                         <i class="bi bi-download"></i>
                         Exportar Lançamentos
                     </span>
-                    <button type="button" class="btn-close"
-                            data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
 
                 <div class="modal-body p-4">
 
-                    <!-- Competência -->
                     <p class="modal-section-label">Competência <span class="text-danger">*</span></p>
                     <div class="row g-3 mb-1">
                         <div class="col-12 col-md-6">
@@ -926,15 +854,13 @@
                         </div>
                     </div>
 
-                    <!-- Formato -->
                     <p class="modal-section-label">Formato de Exportação</p>
                     <div class="row g-2">
                         <div class="col-auto">
                             <input type="radio" class="btn-check" name="expFormato"
                                    id="expXlsx" value="xlsx" autocomplete="off" checked />
                             <label class="btn btn-sm btn-outline-secondary" for="expXlsx">
-                                <i class="bi bi-file-earmark-spreadsheet me-1"></i>
-                                Excel (.xlsx)
+                                <i class="bi bi-file-earmark-spreadsheet me-1"></i> Excel (.xlsx)
                             </label>
                         </div>
                         <div class="col-auto">
@@ -945,15 +871,14 @@
                             </label>
                         </div>
                     </div>
+
                 </div>
 
-                <div class="modal-footer"
-                     style="border-top:1px solid var(--border); padding:.75rem 1.25rem;">
+                <div class="modal-footer" style="border-top:1px solid var(--border); padding:.75rem 1.25rem;">
                     <button type="button" class="btn-outline-custom" data-bs-dismiss="modal">
                         <i class="bi bi-x-lg"></i> Cancelar
                     </button>
-                    <button type="button" class="btn-primary-custom"
-                            id="btnConfirmarExportacao">
+                    <button type="button" class="btn-primary-custom" id="btnConfirmarExportacao">
                         <i class="bi bi-download"></i> Exportar
                     </button>
                 </div>
@@ -962,30 +887,16 @@
         </div>
     </div>
 
-
-    <!-- ════════════════════════════════════
-         SCRIPTS
-    ════════════════════════════════════ -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/ui.js"></script>
 
     <script>
-        /* ═══════════════════════════════════════════════════════════════
-           LANÇAMENTOS — listagem, cadastro e exportação
-        ═══════════════════════════════════════════════════════════════ */
-
-        var API_BASE = '/api/lancamentos-financeiros';
-
-        var currentResults = [];
-        var isLoading = false;
-        var isSaving = false;
-        var hadResults = false;
-        var editandoId = null;   /* null = modo cadastro | number = modo edição */
-
-        /* ── flatpickr: data do lançamento ────────────────────────── */
         flatpickr('#cadDataLancamento', {
             locale: 'pt',
             dateFormat: 'd/m/Y',
@@ -993,8 +904,7 @@
             onChange: function () { clearFieldError('cadDataLancamento'); }
         });
 
-        /* ── flatpickr: competência da exportação (month+year only) ─ */
-        var fpExportCompetencia = flatpickr('#expCompetencia', {
+        fpExportCompetencia = flatpickr('#expCompetencia', {
             locale: 'pt',
             plugins: [
                 new monthSelectPlugin({
@@ -1003,72 +913,9 @@
                     altFormat: 'F Y'
                 })
             ],
-            onChange: function () {
-                clearExpError();
-            }
+            onChange: function () { clearExpError(); }
         });
 
-        /* ── Utilitários de formatação ─────────────────────────────── */
-        function parseDotNetDate(val) {
-            if (!val) return null;
-            if (typeof val === 'string') {
-                var m = val.match(/\/Date\((-?\d+)(?:[+-]\d{4})?\)\//);
-                if (m) return new Date(parseInt(m[1], 10));
-            }
-            var d = new Date(val);
-            return isNaN(d) ? null : d;
-        }
-
-        function formatDate(val) {
-            var d = parseDotNetDate(val);
-            if (!d) return '—';
-            return d.toLocaleDateString('pt-BR');
-        }
-
-        function formatCurrency(value) {
-            return (value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        }
-
-        function formatPercent(value) {
-            return (value || 0).toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }) + '%';
-        }
-
-        function escapeHtml(str) {
-            var d = document.createElement('div');
-            d.appendChild(document.createTextNode(str || ''));
-            return d.innerHTML;
-        }
-
-        function parseBrDecimal(str) {
-            if (!str) return 0;
-            return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
-        }
-
-        function formatBrDecimal(val) {
-            return val.toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-        }
-
-        /* ── Mapeamentos de enum ────────────────────────────────────── */
-        function isCredito(tipo) {
-            return tipo === 0 || tipo === 'Credito';
-        }
-
-        var STATUS_MAP = {
-            0: { cls: 'badge-aberto', lbl: 'Aberto' },
-            1: { cls: 'badge-pago', lbl: 'Pago' },
-            2: { cls: 'badge-cancelado', lbl: 'Cancelado' },
-            'Aberto': { cls: 'badge-aberto', lbl: 'Aberto' },
-            'Pago': { cls: 'badge-pago', lbl: 'Pago' },
-            'Cancelado': { cls: 'badge-cancelado', lbl: 'Cancelado' }
-        };
-
-        /* ── Atualiza uma única linha da tabela ────────────────────── */
         function atualizarLinha(item) {
             var tr = document.querySelector('tr[data-id="' + item.Id + '"]');
             if (!tr) return;
@@ -1077,20 +924,14 @@
             var tipoLbl = cred ? 'Crédito' : 'Débito';
             var valCls = cred ? 'val-credit' : 'val-debit';
             var st = STATUS_MAP[item.status] || { cls: 'badge-aberto', lbl: String(item.status) };
-            var isPago = item.status === 'Pago' || item.status === 1;
+            var itemPago = isPago(item.status);
             var isCancelado = item.status === 'Cancelado' || item.status === 2;
-
-            var btnEditar = isPago || isCancelado
-                ? ''
-                : '<button class="btn-icon edit" title="Editar" onclick="editarLancamento(' + item.id + ')"><i class="bi bi-pencil"></i></button>';
-
-            var btnPagar = isPago || isCancelado
-                ? ''
-                : '<button class="btn-icon pay"    title="Pagar"    onclick="pagarLancamento(' + item.id + ')"><i class="bi bi-check-circle"></i></button>';
-            var btnCancelar = isPago || isCancelado
-                ? ''
-                : '<button class="btn-icon cancel" title="Cancelar" onclick="cancelarLancamento(' + item.id + ')"><i class="bi bi-x-circle"></i></button>';
-
+            var btnEditar = itemPago || isCancelado ? '' :
+                '<button class="btn-icon edit" title="Editar" onclick="editarLancamento(' + item.id + ')"><i class="bi bi-pencil"></i></button>';
+            var btnPagar = itemPago || isCancelado ? '' :
+                '<button class="btn-icon pay" title="Pagar" onclick="pagarLancamento(' + item.id + ')"><i class="bi bi-check-circle"></i></button>';
+            var btnCancelar = itemPago || isCancelado ? '' :
+                '<button class="btn-icon cancel" title="Cancelar" onclick="cancelarLancamento(' + item.id + ')"><i class="bi bi-x-circle"></i></button>';
             tr.innerHTML =
                 '<td>' + formatDate(item.dataLancamento) + '</td>' +
                 '<td class="desc-cell" title="' + escapeHtml(item.descricao) + '">' + escapeHtml(item.descricao) + '</td>' +
@@ -1101,58 +942,12 @@
                 '<td class="text-end"><span class="val-mono ' + valCls + '">' + formatCurrency(item.valorCalculado) + '</span></td>' +
                 '<td>' + formatDate(item.dataCriacao) + '</td>' +
                 '<td><span class="badge-status ' + st.cls + '">' + st.lbl + '</span></td>' +
-                '<td class="text-center">' +
-                '<div class="d-flex gap-1 justify-content-center">' +
-                btnEditar +
-                btnPagar +
-                btnCancelar +
-                '</div></td>';
+                '<td class="text-center"><div class="d-flex gap-1 justify-content-center">' + btnEditar + btnPagar + btnCancelar + '</div></td>';
         }
 
-        /* ── Estado de carregamento da tabela ─────────────────────── */
-        function setUILoading(loading) {
-            isLoading = loading;
-            var btnP = document.getElementById('btnPesquisar');
-            btnP.disabled = loading;
-            btnP.innerHTML = loading
-                ? '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>&nbsp;Carregando...'
-                : '<i class="bi bi-arrow-clockwise"></i> Atualizar';
-            document.getElementById('btnCadastrar').disabled = loading;
-            if (loading) setExportButton(false);
-            toggleTableOverlay(loading);
-        }
-
-        function toggleTableOverlay(show) {
-            var overlay = document.getElementById('tblLoadingOverlay');
-            if (show) {
-                overlay.classList.add('active');
-                renderSkeletonRows();
-            } else {
-                overlay.classList.remove('active');
-            }
-        }
-
-        function renderSkeletonRows() {
-            var widths = [7, 14, 5, 6, 3, 3, 6, 7, 5, 4];
-            var rows = '';
-            for (var i = 0; i < 6; i++) {
-                var cells = widths.map(function (w) {
-                    return '<td><span class="skeleton-bar" style="width:' + (w * 10) + 'px;"></span></td>';
-                }).join('');
-                rows += '<tr class="skeleton-row">' + cells + '</tr>';
-            }
-            document.getElementById('tblBody').innerHTML = rows;
-        }
-
-        function setExportButton(enabled) {
-            document.getElementById('btnExportar').disabled = !enabled;
-        }
-
-        /* ── Listar (sem filtros) ──────────────────────────────────── */
         function pesquisar() {
             if (isLoading) return;
             setUILoading(true);
-
             fetch(API_BASE + '/listar', {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
@@ -1183,25 +978,18 @@
                 });
         }
 
-        /* ── Renderizar tabela ─────────────────────────────────────── */
         function renderTable(data) {
             var tbody = document.getElementById('tblBody');
-            var badgeTotal = document.getElementById('badgeTotal');
-            var lblReg = document.getElementById('lblRegistros');
             var count = data.length;
-
-            badgeTotal.textContent = count + ' registro' + (count !== 1 ? 's' : '');
-            lblReg.textContent = 'Exibindo ' + count + ' de ' + count + ' registros';
-
+            document.getElementById('badgeTotal').textContent = count + ' registro' + (count !== 1 ? 's' : '');
+            document.getElementById('lblRegistros').textContent = 'Exibindo ' + count + ' de ' + count + ' registros';
             if (count === 0) {
                 tbody.innerHTML =
                     '<tr><td colspan="10"><div class="empty-state">' +
-                    '<i class="bi bi-inbox"></i>' +
-                    '<p>Nenhum lançamento encontrado.</p>' +
+                    '<i class="bi bi-inbox"></i><p>Nenhum lançamento encontrado.</p>' +
                     '</div></td></tr>';
                 return;
             }
-
             var rows = '';
             for (var i = 0; i < count; i++) {
                 var item = data[i];
@@ -1210,25 +998,14 @@
                 var tipoLbl = cred ? 'Crédito' : 'Débito';
                 var valCls = cred ? 'val-credit' : 'val-debit';
                 var st = STATUS_MAP[item.status] || { cls: 'badge-aberto', lbl: String(item.status) };
-
-                var isPago = item.status === 'Pago' || item.status === 1;
+                var itemPago = isPago(item.status);
                 var isCancelado = item.status === 'Cancelado' || item.status === 2;
-
-                /* Botão Pagar: visível apenas quando Aberto */
-                var btnEditar = (!isPago && !isCancelado)
-                    ? '<button class="btn-icon edit" title="Editar" onclick="editarLancamento(' + item.id + ')"><i class="bi bi-pencil"></i></button>'
-                    : '';
-
-                /* Botão Pagar: visível apenas quando Aberto */
-                var btnPagar = (!isPago && !isCancelado)
-                    ? '<button class="btn-icon pay" title="Pagar" onclick="pagarLancamento(' + item.id + ', \'' + escapeHtml(item.descricao) + '\')"><i class="bi bi-cash"></i></button>'
-                    : '';
-
-                /* Botão Cancelar: visível quando Aberto */
-                var btnCancelar = (!isPago && !isCancelado)
-                    ? '<button class="btn-icon del" title="Cancelar" onclick="cancelarLancamento(' + item.id + ', \'' + escapeHtml(item.descricao) + '\')"><i class="bi bi-x-circle"></i></button>'
-                    : '';
-
+                var btnEditar = (!itemPago && !isCancelado)
+                    ? '<button class="btn-icon edit" title="Editar" onclick="editarLancamento(' + item.id + ')"><i class="bi bi-pencil"></i></button>' : '';
+                var btnPagar = (!itemPago && !isCancelado)
+                    ? '<button class="btn-icon pay" title="Pagar" onclick="pagarLancamento(' + item.id + ', \'' + escapeHtml(item.descricao) + '\')"><i class="bi bi-cash"></i></button>' : '';
+                var btnCancelar = (!itemPago && !isCancelado)
+                    ? '<button class="btn-icon del" title="Cancelar" onclick="cancelarLancamento(' + item.id + ', \'' + escapeHtml(item.descricao) + '\')"><i class="bi bi-x-circle"></i></button>' : '';
                 rows +=
                     '<tr>' +
                     '<td>' + formatDate(item.dataLancamento) + '</td>' +
@@ -1240,99 +1017,70 @@
                     '<td class="text-end"><span class="val-mono ' + valCls + '">' + formatCurrency(item.valorCalculado) + '</span></td>' +
                     '<td>' + formatDate(item.dataCriacao) + '</td>' +
                     '<td><span class="badge-status ' + st.cls + '">' + st.lbl + '</span></td>' +
-                    '<td class="text-center">' +
-                    '<div class="d-flex gap-1 justify-content-center">' +
-                    btnEditar +
-                    btnPagar +
-                    btnCancelar +
-                    '</div></td>' +
+                    '<td class="text-center"><div class="d-flex gap-1 justify-content-center">' + btnEditar + btnPagar + btnCancelar + '</div></td>' +
                     '</tr>';
             }
             tbody.innerHTML = rows;
         }
 
-        /* ── Atualizar KPIs ────────────────────────────────────────── */
         function updateKPIs(data) {
-            /* Bug fix: propriedades são camelCase (item.tipo / item.valorCalculado),
-               não PascalCase (item.Tipo / item.ValorCalculado)                       */
-            var creditos = data.filter(function (i) { return isCredito(i.tipo); });
-            var debitos = data.filter(function (i) { return !isCredito(i.tipo); });
-            var totCred = creditos.reduce(function (s, i) { return s + (i.valorCalculado || 0); }, 0);
-            var totDeb = debitos.reduce(function (s, i) { return s + (i.valorCalculado || 0); }, 0);
-            var saldo = totCred - totDeb;
+            var credTodos = data.filter(function (i) { return isCredito(i.tipo); });
+            var debTodos = data.filter(function (i) { return !isCredito(i.tipo); });
+            var totCred = credTodos.reduce(function (s, i) { return s + (i.valorCalculado || 0); }, 0);
+            var totDeb = debTodos.reduce(function (s, i) { return s + (i.valorCalculado || 0); }, 0);
+            var saldoTodos = totCred - totDeb;
 
-            /* Card "Total dos Lançamentos": exibe saldo (créditos − débitos) */
-            document.getElementById('kpiTotal').textContent = formatCurrency(saldo);
-            document.getElementById('kpiTotal').className =
-                'kpi-value ' + (saldo >= 0 ? 'val-credit' : 'val-debit');
+            document.getElementById('kpiTotal').textContent = formatCurrency(saldoTodos);
+            document.getElementById('kpiTotal').className = 'kpi-value ' + (saldoTodos >= 0 ? 'val-credit' : 'val-debit');
             document.getElementById('kpiTotalSub').innerHTML =
-                '<span class="badge-tipo badge-credito me-1">' + creditos.length + ' crédito' + (creditos.length !== 1 ? 's' : '') + '</span>' +
-                '<span class="badge-tipo badge-debito">' + debitos.length + ' débito' + (debitos.length !== 1 ? 's' : '') + '</span>';
+                '<span class="badge-tipo badge-credito me-1">' + credTodos.length + ' crédito' + (credTodos.length !== 1 ? 's' : '') + '</span>' +
+                '<span class="badge-tipo badge-debito">' + debTodos.length + ' débito' + (debTodos.length !== 1 ? 's' : '') + '</span>';
 
-            /* Card "Saldo": mantém igual */
+            var pagos = data.filter(function (i) { return isPago(i.status); });
+            var credPagos = pagos.filter(function (i) { return isCredito(i.tipo); });
+            var debPagos = pagos.filter(function (i) { return !isCredito(i.tipo); });
+            var saldoPagos =
+                credPagos.reduce(function (s, i) { return s + (i.valorCalculado || 0); }, 0) -
+                debPagos.reduce(function (s, i) { return s + (i.valorCalculado || 0); }, 0);
+
             var saldoEl = document.getElementById('kpiSaldo');
             var saldoIcon = document.querySelector('#kpiSaldoIcon .bi');
-            saldoEl.textContent = formatCurrency(Math.abs(saldo));
-            saldoEl.className = 'kpi-value ' + (saldo >= 0 ? 'val-credit' : 'val-debit');
+            saldoEl.textContent = formatCurrency(saldoPagos);
+            saldoEl.className = 'kpi-value ' + (saldoPagos >= 0 ? 'val-credit' : 'val-debit');
             if (saldoIcon) {
-                saldoIcon.className = saldo >= 0 ? 'bi bi-graph-up-arrow' : 'bi bi-graph-down-arrow';
+                saldoIcon.className = saldoPagos >= 0 ? 'bi bi-graph-up-arrow' : 'bi bi-graph-down-arrow';
+            }
+            var subEl = document.getElementById('kpiSaldoSub');
+            if (subEl) {
+                subEl.textContent = pagos.length + ' registro' + (pagos.length !== 1 ? 's' : '') + ' pago' + (pagos.length !== 1 ? 's' : '');
             }
         }
 
-        /* ── Ações de linha ────────────────────────────────────────── */
         function editarLancamento(id) {
             var item = currentResults.find(function (i) { return i.id === id; });
             if (!item) return;
-
-            /* Marca modo edição */
             editandoId = id;
-
-            /* Ajusta título e ícone do modal */
-            var labelEl = document.getElementById('modalCadastroLabel');
-            labelEl.innerHTML = '<i class="bi bi-pencil-square"></i> Editar Lançamento';
-
-            /* Ajusta texto do botão salvar */
-            document.getElementById('btnSalvarCadastro').innerHTML =
-                '<i class="bi bi-check-lg"></i> Salvar Alterações';
-
-            /* Preenche os campos */
+            document.getElementById('modalCadastroLabel').innerHTML = '<i class="bi bi-pencil-square"></i> Editar Lançamento';
+            document.getElementById('btnSalvarCadastro').innerHTML = '<i class="bi bi-check-lg"></i> Salvar Alterações';
             document.getElementById('cadDescricao').value = item.descricao || '';
-
             var tipoVal = (item.tipo === 'Credito' || item.tipo === 0) ? 'C' : 'D';
             document.getElementById('cadTipo').value = tipoVal;
-
-            /* Dispara a lógica de exibir taxa/desconto */
             onCadTipoChange();
-
-            /* Preenche taxa/desconto após onCadTipoChange (que limpa os campos) */
             if (tipoVal === 'D') {
-                document.getElementById('cadTaxa').value =
-                    formatBrDecimal(item.percentualTaxa || 0);
+                document.getElementById('cadTaxa').value = formatBrDecimal(item.percentualTaxa || 0);
             } else {
-                document.getElementById('cadDesconto').value =
-                    formatBrDecimal(item.percentualDesconto || 0);
+                document.getElementById('cadDesconto').value = formatBrDecimal(item.percentualDesconto || 0);
             }
-
-            document.getElementById('cadValorOriginal').value =
-                formatBrDecimal(item.valorOriginal || 0);
-
-            /* Data via flatpickr */
+            document.getElementById('cadValorOriginal').value = item.valorOriginal || 0;
             var fp = document.querySelector('#cadDataLancamento')._flatpickr;
             if (fp) {
                 var dataLanc = parseDotNetDate(item.dataLancamento);
                 if (dataLanc) fp.setDate(dataLanc, true);
             }
-
-            /* Recalcula o valor calculado */
             recalcularValor();
-
-            /* Abre o modal */
-            bootstrap.Modal.getOrCreateInstance(
-                document.getElementById('modalCadastro')
-            ).show();
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modalCadastro')).show();
         }
 
-        /* ── Pagar lançamento ──────────────────────────────────────── */
         function pagarLancamento(id, descricao) {
             Swal.fire({
                 title: 'Confirmar pagamento',
@@ -1346,40 +1094,21 @@
                 reverseButtons: true
             }).then(function (result) {
                 if (!result.isConfirmed) return;
-
-                fetch(API_BASE + '/' + id + '/pagar', {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' }
-                })
+                fetch(API_BASE + '/' + id + '/pagar', { method: 'PATCH', headers: { 'Content-Type': 'application/json' } })
                     .then(function (response) {
                         if (!response.ok) throw new Error('HTTP ' + response.status + ' — ' + response.statusText);
                         return response.text();
                     })
                     .then(function () {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Pagamento confirmado!',
-                            text: 'O lançamento foi marcado como pago.',
-                            confirmButtonColor: '#2563EB',
-                            confirmButtonText: 'OK',
-                            timer: 3000,
-                            timerProgressBar: true
-                        });
+                        Swal.fire({ icon: 'success', title: 'Pagamento confirmado!', text: 'O lançamento foi marcado como pago.', confirmButtonColor: '#2563EB', confirmButtonText: 'OK', timer: 3000, timerProgressBar: true });
                         pesquisar();
                     })
                     .catch(function (err) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Erro ao pagar',
-                            html: escapeHtml(err.message),
-                            confirmButtonColor: '#2563EB',
-                            confirmButtonText: 'Fechar'
-                        });
+                        Swal.fire({ icon: 'error', title: 'Erro ao pagar', html: escapeHtml(err.message), confirmButtonColor: '#2563EB', confirmButtonText: 'Fechar' });
                     });
             });
         }
 
-        /* ── Cancelar lançamento ───────────────────────────────────── */
         function cancelarLancamento(id, descricao) {
             Swal.fire({
                 title: 'Confirmar cancelamento',
@@ -1393,51 +1122,26 @@
                 reverseButtons: true
             }).then(function (result) {
                 if (!result.isConfirmed) return;
-
-                fetch(API_BASE + '/' + id + '/cancelar', {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' }
-                })
+                fetch(API_BASE + '/' + id + '/cancelar', { method: 'PATCH', headers: { 'Content-Type': 'application/json' } })
                     .then(function (response) {
                         if (!response.ok) throw new Error('HTTP ' + response.status + ' — ' + response.statusText);
                         return response.text();
                     })
                     .then(function () {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Lançamento cancelado!',
-                            text: 'O lançamento foi cancelado com sucesso.',
-                            confirmButtonColor: '#2563EB',
-                            confirmButtonText: 'OK',
-                            timer: 3000,
-                            timerProgressBar: true
-                        });
+                        Swal.fire({ icon: 'success', title: 'Lançamento cancelado!', text: 'O lançamento foi cancelado com sucesso.', confirmButtonColor: '#2563EB', confirmButtonText: 'OK', timer: 3000, timerProgressBar: true });
                         pesquisar();
                     })
                     .catch(function (err) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Erro ao cancelar',
-                            html: escapeHtml(err.message),
-                            confirmButtonColor: '#2563EB',
-                            confirmButtonText: 'Fechar'
-                        });
+                        Swal.fire({ icon: 'error', title: 'Erro ao cancelar', html: escapeHtml(err.message), confirmButtonColor: '#2563EB', confirmButtonText: 'Fechar' });
                     });
             });
         }
 
-        /* ── Listener do botão Atualizar ───────────────────────────── */
         document.getElementById('btnPesquisar').addEventListener('click', pesquisar);
-
-
-        /* ═══════════════════════════════════════════════════════════════
-           MODAL DE CADASTRO
-        ═══════════════════════════════════════════════════════════════ */
 
         function setFieldError(fieldId, show) {
             var field = document.getElementById(fieldId);
-            var errId = 'err' + fieldId.replace('cad', '');
-            var err = document.getElementById(errId);
+            var err = document.getElementById('err' + fieldId.replace('cad', ''));
             if (show) {
                 field.classList.add('is-invalid');
                 if (err) err.style.display = 'block';
@@ -1451,116 +1155,86 @@
             setFieldError(fieldId, false);
         }
 
-        /* ── Tipo → exibe taxa ou desconto ─────────────────────────── */
         function onCadTipoChange() {
             var tipo = document.getElementById('cadTipo').value;
-            var wrapTaxa = document.getElementById('wrapTaxa');
-            var wrapDesconto = document.getElementById('wrapDesconto');
-
-            wrapTaxa.classList.add('d-none');
-            wrapDesconto.classList.add('d-none');
-
+            document.getElementById('wrapTaxa').classList.add('d-none');
+            document.getElementById('wrapDesconto').classList.add('d-none');
             if (tipo === 'D') {
-                wrapTaxa.classList.remove('d-none');
+                document.getElementById('wrapTaxa').classList.remove('d-none');
                 document.getElementById('cadDesconto').value = '';
             } else if (tipo === 'C') {
-                wrapDesconto.classList.remove('d-none');
+                document.getElementById('wrapDesconto').classList.remove('d-none');
                 document.getElementById('cadTaxa').value = '';
             } else {
                 document.getElementById('cadTaxa').value = '';
                 document.getElementById('cadDesconto').value = '';
             }
-
             clearFieldError('cadTipo');
             recalcularValor();
         }
 
-        /* ── Cálculo automático ────────────────────────────────────── */
         function recalcularValor() {
             var tipo = document.getElementById('cadTipo').value;
-            var valorOriginal = parseBrDecimal(document.getElementById('cadValorOriginal').value);
+            var valorOriginal = parseFloat(document.getElementById('cadValorOriginal').value) || 0;
             var taxa = parseBrDecimal(document.getElementById('cadTaxa').value);
             var desconto = parseBrDecimal(document.getElementById('cadDesconto').value);
             var resultado = valorOriginal;
-
             if (tipo === 'D' && taxa > 0) {
                 resultado = valorOriginal + (valorOriginal * taxa / 100);
             } else if (tipo === 'C' && desconto > 0) {
                 resultado = valorOriginal - (valorOriginal * desconto / 100);
             }
-
             document.getElementById('cadValorCalculado').value = formatBrDecimal(resultado);
         }
 
-        /* ── Validação ─────────────────────────────────────────────── */
         function validarFormCadastro() {
             var ok = true;
-
             var descricao = document.getElementById('cadDescricao').value.trim();
             setFieldError('cadDescricao', !descricao);
             if (!descricao) ok = false;
-
             var tipo = document.getElementById('cadTipo').value;
             setFieldError('cadTipo', !tipo);
             if (!tipo) ok = false;
-
             var dataLanc = document.getElementById('cadDataLancamento').value.trim();
             setFieldError('cadDataLancamento', !dataLanc);
             if (!dataLanc) ok = false;
-
-            var valorOriginal = parseBrDecimal(document.getElementById('cadValorOriginal').value);
+            var valorOriginal = parseFloat(document.getElementById('cadValorOriginal').value) || 0;
             setFieldError('cadValorOriginal', valorOriginal <= 0);
             if (valorOriginal <= 0) ok = false;
-
             return ok;
         }
 
-        /* ── Reset do modal ────────────────────────────────────────── */
         function resetarFormCadastro() {
-            /* Volta ao modo cadastro */
             editandoId = null;
-            document.getElementById('modalCadastroLabel').innerHTML =
-                '<i class="bi bi-plus-circle"></i> Cadastrar Lançamento';
-            document.getElementById('btnSalvarCadastro').innerHTML =
-                '<i class="bi bi-check-lg"></i> Salvar Lançamento';
-
+            document.getElementById('modalCadastroLabel').innerHTML = '<i class="bi bi-plus-circle"></i> Cadastrar Lançamento';
+            document.getElementById('btnSalvarCadastro').innerHTML = '<i class="bi bi-check-lg"></i> Salvar Lançamento';
             ['cadDescricao', 'cadValorOriginal', 'cadTaxa', 'cadDesconto', 'cadValorCalculado'].forEach(function (id) {
                 document.getElementById(id).value = '';
             });
             document.getElementById('cadTipo').value = '';
             document.getElementById('wrapTaxa').classList.add('d-none');
             document.getElementById('wrapDesconto').classList.add('d-none');
-
             var fp = document.querySelector('#cadDataLancamento')._flatpickr;
             if (fp) fp.clear();
-
             ['cadDescricao', 'cadTipo', 'cadDataLancamento', 'cadValorOriginal'].forEach(clearFieldError);
         }
 
-        /* ── Coleta dados do formulário ────────────────────────────── */
         function coletarDadosFormulario() {
             var fp = document.querySelector('#cadDataLancamento')._flatpickr;
-            var dataISO = fp && fp.selectedDates[0]
-                ? fp.selectedDates[0].toISOString().split('T')[0]
-                : '';
-
+            var dataISO = fp && fp.selectedDates[0] ? fp.selectedDates[0].toISOString().split('T')[0] : '';
             var dados = {
                 descricao: document.getElementById('cadDescricao').value.trim(),
                 tipo: document.getElementById('cadTipo').value === 'C' ? 'Credito' : 'Debito',
-                valorOriginal: parseBrDecimal(document.getElementById('cadValorOriginal').value),
+                valorOriginal: parseFloat(document.getElementById('cadValorOriginal').value) || 0,
                 percentualTaxa: parseBrDecimal(document.getElementById('cadTaxa').value),
                 percentualDesconto: parseBrDecimal(document.getElementById('cadDesconto').value),
                 valorCalculado: parseBrDecimal(document.getElementById('cadValorCalculado').value),
                 dataLancamento: dataISO
             };
-
-            /* Em modo edição inclui o id no payload (DTO exige) */
             if (editandoId !== null) dados.id = editandoId;
-
             return dados;
         }
 
-        /* ── Controle de loading do modal ──────────────────────────── */
         function setModalLoading(loading) {
             isSaving = loading;
             var modal = document.getElementById('modalCadastro');
@@ -1578,23 +1252,17 @@
             if (btnClose) btnClose.style.visibility = loading ? 'hidden' : '';
         }
 
-        /* Impede fechamento enquanto salva */
         document.getElementById('modalCadastro').addEventListener('hide.bs.modal', function (e) {
             if (isSaving) e.preventDefault();
         });
 
-        /* ── Salvar lançamento (cadastro ou edição) ────────────────── */
         function salvarLancamento() {
             if (!validarFormCadastro()) return;
-
             var dados = coletarDadosFormulario();
             var modoEdicao = editandoId !== null;
-            var url = modoEdicao ? API_BASE + '/' + editandoId : API_BASE;
             var method = modoEdicao ? 'PUT' : 'POST';
-
             setModalLoading(true);
-
-            fetch(url, {
+            fetch(API_BASE, {
                 method: method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dados)
@@ -1610,9 +1278,7 @@
                         Swal.fire({
                             icon: 'success',
                             title: modoEdicao ? 'Lançamento atualizado!' : 'Lançamento cadastrado!',
-                            text: modoEdicao
-                                ? 'As alterações foram salvas com sucesso.'
-                                : 'O lançamento foi salvo com sucesso.',
+                            text: modoEdicao ? 'As alterações foram salvas com sucesso.' : 'O lançamento foi salvo com sucesso.',
                             confirmButtonColor: '#2563EB',
                             confirmButtonText: 'OK',
                             timer: 3000,
@@ -1633,35 +1299,13 @@
                 });
         }
 
-        /* ── Event listeners do modal de cadastro ──────────────────── */
-        document.getElementById('cadTipo')
-            .addEventListener('change', onCadTipoChange);
-
-        document.getElementById('cadValorOriginal')
-            .addEventListener('input', function () {
-                clearFieldError('cadValorOriginal');
-                recalcularValor();
-            });
-
-        document.getElementById('cadTaxa')
-            .addEventListener('input', recalcularValor);
-
-        document.getElementById('cadDesconto')
-            .addEventListener('input', recalcularValor);
-
-        document.getElementById('cadDescricao')
-            .addEventListener('input', function () { clearFieldError('cadDescricao'); });
-
-        document.getElementById('btnSalvarCadastro')
-            .addEventListener('click', salvarLancamento);
-
-        document.getElementById('modalCadastro')
-            .addEventListener('hidden.bs.modal', resetarFormCadastro);
-
-
-        /* ═══════════════════════════════════════════════════════════════
-           MODAL DE EXPORTAÇÃO
-        ═══════════════════════════════════════════════════════════════ */
+        document.getElementById('cadTipo').addEventListener('change', onCadTipoChange);
+        document.getElementById('cadValorOriginal').addEventListener('input', function () { clearFieldError('cadValorOriginal'); recalcularValor(); });
+        document.getElementById('cadTaxa').addEventListener('input', recalcularValor);
+        document.getElementById('cadDesconto').addEventListener('input', recalcularValor);
+        document.getElementById('cadDescricao').addEventListener('input', function () { clearFieldError('cadDescricao'); });
+        document.getElementById('btnSalvarCadastro').addEventListener('click', salvarLancamento);
+        document.getElementById('modalCadastro').addEventListener('hidden.bs.modal', resetarFormCadastro);
 
         function clearExpError() {
             var field = document.getElementById('expCompetencia');
@@ -1670,7 +1314,6 @@
             if (err) err.style.display = '';
         }
 
-        /* Limpa o picker ao fechar o modal */
         document.getElementById('modalExportacao').addEventListener('hidden.bs.modal', function () {
             fpExportCompetencia.clear();
             clearExpError();
@@ -1678,7 +1321,6 @@
         });
 
         document.getElementById('btnConfirmarExportacao').addEventListener('click', function () {
-            /* Validar competência */
             var selectedDates = fpExportCompetencia.selectedDates;
             if (!selectedDates || selectedDates.length === 0) {
                 var field = document.getElementById('expCompetencia');
@@ -1687,29 +1329,59 @@
                 if (err) err.style.display = 'block';
                 return;
             }
-
             var date = selectedDates[0];
             var mes = String(date.getMonth() + 1).padStart(2, '0');
             var ano = date.getFullYear();
-            var competencia = ano + '-' + mes;          /* ex: 2025-06 */
+            var competencia = ano + '-' + mes;
             var formato = document.querySelector('input[name="expFormato"]:checked').value;
-
             var url = API_BASE + '/exportar?competencia=' + competencia + '&tipoExportacao=' + formato;
-
-            /* Dispara download via âncora */
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = '';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-
-            bootstrap.Modal.getInstance(document.getElementById('modalExportacao')).hide();
+            var btn = document.getElementById('btnConfirmarExportacao');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>&nbsp;Exportando...';
+            fetch(url, { method: 'GET' })
+                .then(function (response) {
+                    if (!response.ok) {
+                        return response.text().then(function (body) {
+                            throw new Error('HTTP ' + response.status + ' — ' + (body || response.statusText));
+                        });
+                    }
+                    var disposition = response.headers.get('Content-Disposition') || '';
+                    var filenameMatch = disposition.match(/filename[^;=\n]*=(?:(['"])([^'"]*)\1|([^;\n]*))/i);
+                    var filename = filenameMatch
+                        ? (filenameMatch[2] || filenameMatch[3] || '').trim()
+                        : 'lancamentos-' + competencia + '.' + formato;
+                    return response.blob().then(function (blob) {
+                        return { blob: blob, filename: filename };
+                    });
+                })
+                .then(function (result) {
+                    var blobUrl = URL.createObjectURL(result.blob);
+                    var a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = result.filename;
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    setTimeout(function () { URL.revokeObjectURL(blobUrl); }, 10000);
+                    bootstrap.Modal.getInstance(document.getElementById('modalExportacao')).hide();
+                })
+                .catch(function (err) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro ao exportar',
+                        html: 'Não foi possível gerar o arquivo de exportação.<br><small class="text-muted">' + escapeHtml(err.message) + '</small>',
+                        confirmButtonColor: '#2563EB',
+                        confirmButtonText: 'Fechar'
+                    });
+                })
+                .finally(function () {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-download"></i> Exportar';
+                });
         });
 
-        /* ── FIX 2: Pesquisa automática ao entrar na tela ───────────── */
         pesquisar();
-
     </script>
 
 </body>
