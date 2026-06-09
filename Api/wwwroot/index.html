@@ -1,0 +1,1543 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lançamentos Financeiros</title>
+
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <!-- flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <!-- flatpickr monthSelect plugin -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css" />
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ── Tokens ── */
+        :root {
+            --navy: #1C2D4F;
+            --navy-light: #253d6b;
+            --blue: #2563EB;
+            --blue-hover: #1d4ed8;
+            --green: #16A34A;
+            --red: #DC2626;
+            --bg: #F1F5F9;
+            --surface: #FFFFFF;
+            --border: #E2E8F0;
+            --text: #1E293B;
+            --muted: #64748B;
+            --mono: 'Courier New', Courier, monospace;
+        }
+
+        /* ── Base ── */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            font-size: 0.875rem;
+            min-height: 100vh;
+        }
+
+        /* ── Header / Topbar ── */
+        .topbar {
+            background: var(--navy);
+            color: #fff;
+            padding: 0 1.5rem;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,.20);
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: -.02em;
+        }
+
+            .topbar-brand .bi {
+                font-size: 1.25rem;
+                color: #60A5FA;
+            }
+
+        .topbar-meta {
+            font-size: .75rem;
+            color: #94A3B8;
+        }
+
+        /* ── Page title bar ── */
+        .page-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: .75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+            .page-header h1 {
+                font-size: 1rem;
+                font-weight: 600;
+                margin: 0;
+                color: var(--text);
+            }
+
+            .page-header .breadcrumb {
+                margin: 0;
+                font-size: .75rem;
+            }
+
+            .page-header .breadcrumb-item.active {
+                color: var(--muted);
+            }
+
+        /* ── Layout ── */
+        .main-content {
+            padding: 1.5rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* ── Cards genéricos ── */
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,.06);
+        }
+
+        .card-header-custom {
+            padding: .75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            font-weight: 600;
+            font-size: .8125rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            background: #FAFBFC;
+            border-radius: 10px 10px 0 0;
+        }
+
+            .card-header-custom .bi {
+                font-size: .875rem;
+            }
+
+        /* ── Labels de formulário ── */
+        .filter-label {
+            font-size: .75rem;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: .3rem;
+            letter-spacing: .03em;
+        }
+
+        .form-select, .form-control {
+            font-size: .875rem;
+            border-color: var(--border);
+            border-radius: 7px;
+            color: var(--text);
+        }
+
+            .form-select:focus, .form-control:focus {
+                border-color: var(--blue);
+                box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+            }
+
+            .form-select:disabled, .form-control:disabled {
+                background-color: #F8FAFC;
+                opacity: .65;
+                cursor: not-allowed;
+            }
+
+        /* ── Botões ── */
+        .btn-primary-custom {
+            background: var(--blue);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            font-size: .8125rem;
+            border-radius: 7px;
+            padding: .45rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            transition: background .15s, opacity .15s;
+            cursor: pointer;
+        }
+
+            .btn-primary-custom:hover:not(:disabled) {
+                background: var(--blue-hover);
+                color: #fff;
+            }
+
+        .btn-success-custom {
+            background: var(--green);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            font-size: .8125rem;
+            border-radius: 7px;
+            padding: .45rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            transition: background .15s, opacity .15s;
+            cursor: pointer;
+        }
+
+            .btn-success-custom:hover:not(:disabled) {
+                background: #15803d;
+                color: #fff;
+            }
+
+        .btn-outline-custom {
+            background: transparent;
+            border: 1.5px solid var(--border);
+            color: var(--text);
+            font-weight: 600;
+            font-size: .8125rem;
+            border-radius: 7px;
+            padding: .45rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            transition: border-color .15s, background .15s, opacity .15s;
+            cursor: pointer;
+        }
+
+            .btn-outline-custom:hover:not(:disabled) {
+                border-color: var(--blue);
+                color: var(--blue);
+                background: #EFF6FF;
+            }
+
+        button:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* ── KPI Cards ── */
+        .kpi-card {
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            padding: 1.125rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,.06);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .kpi-card::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 4px;
+                border-radius: 10px 0 0 10px;
+            }
+
+            .kpi-card.kpi-total::before {
+                background: var(--blue);
+            }
+
+            .kpi-card.kpi-saldo::before {
+                background: var(--green);
+            }
+
+        .kpi-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .kpi-total .kpi-icon {
+            background: #EFF6FF;
+            color: var(--blue);
+        }
+
+        .kpi-saldo .kpi-icon {
+            background: #F0FDF4;
+            color: var(--green);
+        }
+
+        .kpi-label {
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-bottom: .2rem;
+        }
+
+        .kpi-value {
+            font-family: var(--mono);
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1;
+            transition: color .25s;
+        }
+
+        .kpi-sub {
+            font-size: .72rem;
+            color: var(--muted);
+            margin-top: .3rem;
+        }
+
+        /* ── Tabela ── */
+        .table-card .card-body {
+            padding: 0;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .table-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,.82);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            z-index: 10;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0 0 10px 10px;
+        }
+
+            .table-overlay.active {
+                display: flex;
+            }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .8125rem;
+        }
+
+            .data-table thead tr {
+                background: #F8FAFC;
+                border-bottom: 2px solid var(--border);
+            }
+
+            .data-table thead th {
+                padding: .65rem 1rem;
+                font-weight: 600;
+                font-size: .72rem;
+                color: var(--muted);
+                text-transform: uppercase;
+                letter-spacing: .05em;
+                white-space: nowrap;
+            }
+
+            .data-table tbody tr {
+                border-bottom: 1px solid var(--border);
+                transition: background .1s;
+            }
+
+                .data-table tbody tr:last-child {
+                    border-bottom: none;
+                }
+
+                .data-table tbody tr:hover {
+                    background: #F8FAFC;
+                }
+
+            .data-table tbody td {
+                padding: .7rem 1rem;
+                vertical-align: middle;
+                white-space: nowrap;
+            }
+
+        .desc-cell {
+            max-width: 240px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .skeleton-row td {
+            padding: .85rem 1rem;
+        }
+
+        .skeleton-bar {
+            display: inline-block;
+            height: 12px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #E2E8F0 25%, #F1F5F9 50%, #E2E8F0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .val-mono {
+            font-family: var(--mono);
+            font-size: .8125rem;
+            font-weight: 600;
+        }
+
+        .val-credit {
+            color: var(--green);
+        }
+
+        .val-debit {
+            color: var(--red);
+        }
+
+        .val-neutral {
+            color: var(--text);
+        }
+
+        .badge-tipo {
+            font-size: .7rem;
+            font-weight: 700;
+            padding: .22rem .6rem;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+
+        .badge-credito {
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        .badge-debito {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-status {
+            font-size: .7rem;
+            font-weight: 700;
+            padding: .22rem .6rem;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+
+        .badge-aberto {
+            background: #FEF9C3;
+            color: #854D0E;
+        }
+
+        .badge-pago {
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        .badge-cancelado {
+            background: #F1F5F9;
+            color: #475569;
+        }
+
+        .btn-icon {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--muted);
+            font-size: .875rem;
+            transition: all .15s;
+            cursor: pointer;
+        }
+
+            .btn-icon:hover {
+                background: #F1F5F9;
+                color: var(--text);
+            }
+
+            .btn-icon.edit:hover {
+                border-color: var(--blue);
+                color: var(--blue);
+                background: #EFF6FF;
+            }
+
+            .btn-icon.del:hover {
+                border-color: var(--red);
+                color: var(--red);
+                background: #FEF2F2;
+            }
+
+        .empty-state {
+            padding: 3rem 1rem;
+            text-align: center;
+            color: var(--muted);
+        }
+
+            .empty-state .bi {
+                font-size: 2.5rem;
+                opacity: .3;
+                display: block;
+                margin-bottom: .75rem;
+            }
+
+            .empty-state p {
+                font-size: .875rem;
+                margin: 0;
+            }
+
+        .table-footer {
+            padding: .75rem 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: .5rem;
+            font-size: .78rem;
+            color: var(--muted);
+        }
+
+        /* ── Modais ── */
+        .modal-header-custom {
+            background: var(--navy);
+            color: #fff;
+            border-radius: .5rem .5rem 0 0;
+            padding: 1rem 1.25rem;
+        }
+
+            .modal-header-custom .btn-close {
+                filter: invert(1) grayscale(1);
+                opacity: .7;
+            }
+
+            .modal-header-custom .modal-title {
+                font-size: .9375rem;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: .5rem;
+            }
+
+        .modal-content {
+            border: none;
+            border-radius: .6rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,.18);
+        }
+
+        .modal-section-label {
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--muted);
+            margin: 1.25rem 0 .75rem;
+            padding-bottom: .4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .modal-section-label:first-child {
+                margin-top: 0;
+            }
+
+        /* ── flatpickr monthSelect override ── */
+        .flatpickr-monthSelect-months {
+            margin: .5rem 0;
+        }
+
+        .flatpickr-monthSelect-month {
+            border-radius: 6px !important;
+            font-size: .8125rem !important;
+        }
+
+            .flatpickr-monthSelect-month.selected {
+                background: var(--blue) !important;
+            }
+
+        /* ── Responsivo ── */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .kpi-value {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ════════════════════════════════════
+         TOPBAR
+    ════════════════════════════════════ -->
+    <header class="topbar">
+        <div class="topbar-brand">
+            <i class="bi bi-bar-chart-fill"></i>
+            <span>FinControl</span>
+        </div>
+        <span class="topbar-meta">Gestão Financeira</span>
+    </header>
+
+    <!-- ════════════════════════════════════
+         PAGE HEADER / BREADCRUMB
+    ════════════════════════════════════ -->
+    <div class="page-header">
+        <i class="bi bi-receipt text-secondary" style="font-size:.95rem;"></i>
+        <h1>Lançamentos</h1>
+        <span class="text-secondary" style="font-size:.75rem; margin: 0 .25rem;">|</span>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#" class="text-decoration-none" style="color:var(--blue);">Financeiro</a>
+                </li>
+                <li class="breadcrumb-item active">Lançamentos</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- ════════════════════════════════════
+         CONTEÚDO PRINCIPAL
+    ════════════════════════════════════ -->
+    <main class="main-content">
+
+        <!-- ── AÇÕES + KPI ── -->
+        <div class="row g-3 mb-3 align-items-stretch">
+
+            <!-- Ações -->
+            <div class="col-12 col-lg-4">
+                <div class="d-flex gap-2 flex-wrap h-100 align-items-start pt-1">
+                    <button type="button" class="btn-primary-custom" id="btnPesquisar">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Atualizar
+                    </button>
+                    <button type="button" class="btn-success-custom" id="btnCadastrar"
+                            data-bs-toggle="modal" data-bs-target="#modalCadastro">
+                        <i class="bi bi-plus-lg"></i>
+                        Cadastrar Lançamento
+                    </button>
+                    <button type="button" class="btn-outline-custom" id="btnExportar"
+                            data-bs-toggle="modal" data-bs-target="#modalExportacao"
+                            disabled>
+                        <i class="bi bi-download"></i>
+                        Exportar
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI: Total dos Lançamentos -->
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="kpi-card kpi-total h-100">
+                    <div class="kpi-icon">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                    <div>
+                        <div class="kpi-label">Total dos Lançamentos</div>
+                        <div class="kpi-value" id="kpiTotal">R$ 0,00</div>
+                        <div class="kpi-sub" id="kpiTotalSub">
+                            <span class="badge-tipo badge-credito me-1">0 créditos</span>
+                            <span class="badge-tipo badge-debito">0 débitos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI: Saldo -->
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="kpi-card kpi-saldo h-100">
+                    <div class="kpi-icon" id="kpiSaldoIcon">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                    <div>
+                        <div class="kpi-label">Saldo</div>
+                        <div class="kpi-value" id="kpiSaldo">R$ 0,00</div>
+                        <div class="kpi-sub">Créditos menos Débitos do período</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── TABELA ── -->
+        <div class="card table-card">
+            <div class="card-header-custom" style="justify-content: space-between;">
+                <span><i class="bi bi-table"></i> Listagem de Lançamentos</span>
+                <span class="badge bg-secondary rounded-pill" id="badgeTotal">0 registros</span>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <!-- Overlay de carregamento -->
+                    <div class="table-overlay" id="tblLoadingOverlay">
+                        <div class="d-flex flex-column align-items-center gap-2">
+                            <div class="spinner-border text-primary"
+                                 role="status" style="width:2.25rem;height:2.25rem;">
+                                <span class="visually-hidden">Carregando...</span>
+                            </div>
+                            <span style="font-size:.8125rem;color:var(--muted);">
+                                Buscando lançamentos...
+                            </span>
+                        </div>
+                    </div>
+
+                    <table class="data-table" id="tblLancamentos">
+                        <thead>
+                            <tr>
+                                <th>Data Lançamento</th>
+                                <th>Descrição</th>
+                                <th>Tipo</th>
+                                <th class="text-end">Valor Original</th>
+                                <th class="text-end">Taxa (%)</th>
+                                <th class="text-end">Desconto (%)</th>
+                                <th class="text-end">Valor Calculado</th>
+                                <th>Data de Criação</th>
+                                <th>Status</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblBody">
+                            <tr>
+                                <td colspan="10">
+                                    <div class="empty-state">
+                                        <i class="bi bi-inbox"></i>
+                                        <p>
+                                            Nenhum lançamento encontrado.<br>
+                                            <span style="font-size:.78rem;">
+                                                Clique em <strong>Atualizar</strong> para carregar os dados.
+                                            </span>
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Rodapé -->
+            <div class="table-footer">
+                <span id="lblRegistros">Exibindo 0 de 0 registros</span>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0" id="paginacao">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">Anterior</a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link" href="#">1</a>
+                        </li>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">Próximo</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+    </main>
+
+
+    <!-- ════════════════════════════════════
+         MODAL: CADASTRO DE LANÇAMENTO
+    ════════════════════════════════════ -->
+    <div class="modal fade" id="modalCadastro" tabindex="-1"
+         aria-labelledby="modalCadastroLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header modal-header-custom">
+                    <span class="modal-title" id="modalCadastroLabel">
+                        <i class="bi bi-plus-circle"></i>
+                        Cadastrar Lançamento
+                    </span>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+
+                <div class="modal-body p-4">
+
+                    <!-- Informações Gerais -->
+                    <p class="modal-section-label">Informações Gerais</p>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-8">
+                            <label class="filter-label" for="cadDescricao">
+                                Descrição <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" id="cadDescricao" class="form-control"
+                                   placeholder="Ex.: Pagamento de fornecedor" maxlength="250" />
+                            <div class="invalid-feedback" id="errDescricao">
+                                Informe a descrição do lançamento.
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="filter-label" for="cadTipo">
+                                Tipo <span class="text-danger">*</span>
+                            </label>
+                            <select id="cadTipo" class="form-select">
+                                <option value="">Selecione...</option>
+                                <option value="C">Crédito</option>
+                                <option value="D">Débito</option>
+                            </select>
+                            <div class="invalid-feedback" id="errTipo">
+                                Selecione o tipo de lançamento.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data -->
+                    <p class="modal-section-label">Data</p>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="filter-label" for="cadDataLancamento">
+                                Data do Lançamento <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" id="cadDataLancamento"
+                                   class="form-control" placeholder="dd/mm/aaaa" />
+                            <div class="invalid-feedback" id="errDataLancamento">
+                                Informe a data do lançamento.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Valores -->
+                    <p class="modal-section-label">Valores</p>
+                    <div class="row g-3">
+
+                        <div class="col-12 col-md-4">
+                            <label class="filter-label" for="cadValorOriginal">
+                                Valor Original (R$) <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" id="cadValorOriginal" class="form-control"
+                                   placeholder="0,00" inputmode="decimal" />
+                            <div class="invalid-feedback" id="errValorOriginal">
+                                Informe um valor original maior que zero.
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div id="wrapTaxa" class="d-none">
+                                <label class="filter-label" for="cadTaxa">Taxa (%)</label>
+                                <input type="text" id="cadTaxa" class="form-control"
+                                       placeholder="0,00" inputmode="decimal" />
+                            </div>
+                            <div id="wrapDesconto" class="d-none">
+                                <label class="filter-label" for="cadDesconto">Desconto (%)</label>
+                                <input type="text" id="cadDesconto" class="form-control"
+                                       placeholder="0,00" inputmode="decimal" />
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label class="filter-label" for="cadValorCalculado">
+                                Valor Calculado (R$)
+                            </label>
+                            <input type="text" id="cadValorCalculado" class="form-control"
+                                   readonly tabindex="-1" placeholder="0,00"
+                                   style="background:#F8FAFC; font-weight:600;" />
+                            <div style="font-size:.72rem; color:var(--muted); margin-top:.3rem;">
+                                Calculado automaticamente.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer"
+                     style="border-top:1px solid var(--border); padding:.75rem 1.25rem;">
+                    <button type="button" class="btn-outline-custom" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn-success-custom" id="btnSalvarCadastro">
+                        <i class="bi bi-check-lg"></i> Salvar Lançamento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ════════════════════════════════════
+         MODAL: EXPORTAÇÃO
+    ════════════════════════════════════ -->
+    <div class="modal fade" id="modalExportacao" tabindex="-1"
+         aria-labelledby="modalExportacaoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header modal-header-custom">
+                    <span class="modal-title" id="modalExportacaoLabel">
+                        <i class="bi bi-download"></i>
+                        Exportar Lançamentos
+                    </span>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+
+                <div class="modal-body p-4">
+
+                    <!-- Competência -->
+                    <p class="modal-section-label">Competência <span class="text-danger">*</span></p>
+                    <div class="row g-3 mb-1">
+                        <div class="col-12 col-md-6">
+                            <label class="filter-label" for="expCompetencia">Mês / Ano</label>
+                            <input type="text" id="expCompetencia" class="form-control"
+                                   placeholder="Selecione mês e ano" readonly />
+                            <div class="invalid-feedback" id="errExpCompetencia">
+                                Selecione a competência para exportar.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formato -->
+                    <p class="modal-section-label">Formato de Exportação</p>
+                    <div class="row g-2">
+                        <div class="col-auto">
+                            <input type="radio" class="btn-check" name="expFormato"
+                                   id="expXlsx" value="xlsx" autocomplete="off" checked />
+                            <label class="btn btn-sm btn-outline-secondary" for="expXlsx">
+                                <i class="bi bi-file-earmark-spreadsheet me-1"></i>
+                                Excel (.xlsx)
+                            </label>
+                        </div>
+                        <div class="col-auto">
+                            <input type="radio" class="btn-check" name="expFormato"
+                                   id="expCsv" value="csv" autocomplete="off" />
+                            <label class="btn btn-sm btn-outline-secondary" for="expCsv">
+                                <i class="bi bi-filetype-csv me-1"></i> CSV
+                            </label>
+                        </div>
+                        <div class="col-auto">
+                            <input type="radio" class="btn-check" name="expFormato"
+                                   id="expPdf" value="pdf" autocomplete="off" />
+                            <label class="btn btn-sm btn-outline-secondary" for="expPdf">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer"
+                     style="border-top:1px solid var(--border); padding:.75rem 1.25rem;">
+                    <button type="button" class="btn-outline-custom" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn-primary-custom"
+                            id="btnConfirmarExportacao">
+                        <i class="bi bi-download"></i> Exportar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ════════════════════════════════════
+         SCRIPTS
+    ════════════════════════════════════ -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+
+    <script>
+        /* ═══════════════════════════════════════════════════════════════
+           LANÇAMENTOS — listagem, cadastro e exportação
+        ═══════════════════════════════════════════════════════════════ */
+
+        var API_BASE = '/api/lancamentos-financeiros';
+
+        var currentResults = [];
+        var isLoading = false;
+        var isSaving = false;
+        var hadResults = false;
+
+        /* ── flatpickr: data do lançamento ────────────────────────── */
+        flatpickr('#cadDataLancamento', {
+            locale: 'pt',
+            dateFormat: 'd/m/Y',
+            allowInput: true,
+            onChange: function () { clearFieldError('cadDataLancamento'); }
+        });
+
+        /* ── flatpickr: competência da exportação (month+year only) ─ */
+        var fpExportCompetencia = flatpickr('#expCompetencia', {
+            locale: 'pt',
+            plugins: [
+                new monthSelectPlugin({
+                    shorthand: false,
+                    dateFormat: 'm/Y',
+                    altFormat: 'F Y'
+                })
+            ],
+            onChange: function () {
+                clearExpError();
+            }
+        });
+
+        /* ── Utilitários de formatação ─────────────────────────────── */
+        function parseDotNetDate(val) {
+            if (!val) return null;
+            if (typeof val === 'string') {
+                var m = val.match(/\/Date\((-?\d+)(?:[+-]\d{4})?\)\//);
+                if (m) return new Date(parseInt(m[1], 10));
+            }
+            var d = new Date(val);
+            return isNaN(d) ? null : d;
+        }
+
+        function formatDate(val) {
+            var d = parseDotNetDate(val);
+            if (!d) return '—';
+            return d.toLocaleDateString('pt-BR');
+        }
+
+        function formatCurrency(value) {
+            return (value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function formatPercent(value) {
+            return (value || 0).toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + '%';
+        }
+
+        function escapeHtml(str) {
+            var d = document.createElement('div');
+            d.appendChild(document.createTextNode(str || ''));
+            return d.innerHTML;
+        }
+
+        function parseBrDecimal(str) {
+            if (!str) return 0;
+            return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+        }
+
+        function formatBrDecimal(val) {
+            return val.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        /* ── Mapeamentos de enum ────────────────────────────────────── */
+        function isCredito(tipo) {
+            return tipo === 0 || tipo === 'Credito';
+        }
+
+        var STATUS_MAP = {
+            0: { cls: 'badge-aberto', lbl: 'Aberto' },
+            1: { cls: 'badge-pago', lbl: 'Pago' },
+            2: { cls: 'badge-cancelado', lbl: 'Cancelado' },
+            'Aberto': { cls: 'badge-aberto', lbl: 'Aberto' },
+            'Pago': { cls: 'badge-pago', lbl: 'Pago' },
+            'Cancelado': { cls: 'badge-cancelado', lbl: 'Cancelado' }
+        };
+
+        /* ── Atualiza uma única linha da tabela ────────────────────── */
+        function atualizarLinha(item) {
+            var tr = document.querySelector('tr[data-id="' + item.Id + '"]');
+            if (!tr) return;
+            var cred = isCredito(item.Tipo);
+            var tipoCls = cred ? 'badge-credito' : 'badge-debito';
+            var tipoLbl = cred ? 'Crédito' : 'Débito';
+            var valCls = cred ? 'val-credit' : 'val-debit';
+            var st = STATUS_MAP[item.status] || { cls: 'badge-aberto', lbl: String(item.status) };
+            var isPago = item.status === 'Pago' || item.status === 1;
+            var isCancelado = item.status === 'Cancelado' || item.status === 2;
+            var btnPagar = isPago || isCancelado
+                ? ''
+                : '<button class="btn-icon pay"    title="Pagar"    onclick="pagarLancamento(' + item.id + ')"><i class="bi bi-check-circle"></i></button>';
+            var btnCancelar = isCancelado
+                ? ''
+                : '<button class="btn-icon cancel" title="Cancelar" onclick="cancelarLancamento(' + item.id + ')"><i class="bi bi-x-circle"></i></button>';
+
+            tr.innerHTML =
+                '<td>' + formatDate(item.dataLancamento) + '</td>' +
+                '<td class="desc-cell" title="' + escapeHtml(item.descricao) + '">' + escapeHtml(item.descricao) + '</td>' +
+                '<td><span class="badge-tipo ' + tipoCls + '">' + tipoLbl + '</span></td>' +
+                '<td class="text-end"><span class="val-mono val-neutral">' + formatCurrency(item.valorOriginal) + '</span></td>' +
+                '<td class="text-end"><span class="val-mono val-neutral">' + formatPercent(item.percentualTaxa) + '</span></td>' +
+                '<td class="text-end"><span class="val-mono val-neutral">' + formatPercent(item.percentualDesconto) + '</span></td>' +
+                '<td class="text-end"><span class="val-mono ' + valCls + '">' + formatCurrency(item.valorCalculado) + '</span></td>' +
+                '<td>' + formatDate(item.dataCriacao) + '</td>' +
+                '<td><span class="badge-status ' + st.cls + '">' + st.lbl + '</span></td>' +
+                '<td class="text-center">' +
+                '<div class="d-flex gap-1 justify-content-center">' +
+                '<button class="btn-icon edit" title="Editar" onclick="editarLancamento(' + item.id + ')"><i class="bi bi-pencil"></i></button>' +
+                btnPagar +
+                btnCancelar +
+                '</div></td>';
+        }
+
+        /* ── Estado de carregamento da tabela ─────────────────────── */
+        function setUILoading(loading) {
+            isLoading = loading;
+            var btnP = document.getElementById('btnPesquisar');
+            btnP.disabled = loading;
+            btnP.innerHTML = loading
+                ? '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>&nbsp;Carregando...'
+                : '<i class="bi bi-arrow-clockwise"></i> Atualizar';
+            document.getElementById('btnCadastrar').disabled = loading;
+            if (loading) setExportButton(false);
+            toggleTableOverlay(loading);
+        }
+
+        function toggleTableOverlay(show) {
+            var overlay = document.getElementById('tblLoadingOverlay');
+            if (show) {
+                overlay.classList.add('active');
+                renderSkeletonRows();
+            } else {
+                overlay.classList.remove('active');
+            }
+        }
+
+        function renderSkeletonRows() {
+            var widths = [7, 14, 5, 6, 3, 3, 6, 7, 5, 4];
+            var rows = '';
+            for (var i = 0; i < 6; i++) {
+                var cells = widths.map(function (w) {
+                    return '<td><span class="skeleton-bar" style="width:' + (w * 10) + 'px;"></span></td>';
+                }).join('');
+                rows += '<tr class="skeleton-row">' + cells + '</tr>';
+            }
+            document.getElementById('tblBody').innerHTML = rows;
+        }
+
+        function setExportButton(enabled) {
+            document.getElementById('btnExportar').disabled = !enabled;
+        }
+
+        /* ── Listar (sem filtros) ──────────────────────────────────── */
+        function pesquisar() {
+            if (isLoading) return;
+            setUILoading(true);
+
+            fetch(API_BASE + '/listar', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            })
+                .then(function (response) {
+                    if (!response.ok) throw new Error('HTTP ' + response.status + ' — ' + response.statusText);
+                    return response.json();
+                })
+                .then(function (data) {
+                    currentResults = Array.isArray(data) ? data : [];
+                    hadResults = true;
+                    renderTable(currentResults);
+                    updateKPIs(currentResults);
+                })
+                .catch(function (err) {
+                    console.error('[Lançamentos] Erro ao listar:', err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro ao carregar',
+                        html: 'Não foi possível buscar os lançamentos.<br><small class="text-muted">' + escapeHtml(err.message) + '</small>',
+                        confirmButtonColor: '#2563EB',
+                        confirmButtonText: 'Fechar'
+                    });
+                })
+                .finally(function () {
+                    setUILoading(false);
+                    setExportButton(currentResults.length > 0);
+                });
+        }
+
+        /* ── Renderizar tabela ─────────────────────────────────────── */
+        function renderTable(data) {
+            var tbody = document.getElementById('tblBody');
+            var badgeTotal = document.getElementById('badgeTotal');
+            var lblReg = document.getElementById('lblRegistros');
+            var count = data.length;
+
+            badgeTotal.textContent = count + ' registro' + (count !== 1 ? 's' : '');
+            lblReg.textContent = 'Exibindo ' + count + ' de ' + count + ' registros';
+
+            if (count === 0) {
+                tbody.innerHTML =
+                    '<tr><td colspan="10"><div class="empty-state">' +
+                    '<i class="bi bi-inbox"></i>' +
+                    '<p>Nenhum lançamento encontrado.</p>' +
+                    '</div></td></tr>';
+                return;
+            }
+
+            var rows = '';
+            for (var i = 0; i < count; i++) {
+                var item = data[i];
+                var cred = isCredito(item.tipo);
+                var tipoCls = cred ? 'badge-credito' : 'badge-debito';
+                var tipoLbl = cred ? 'Crédito' : 'Débito';
+                var valCls = cred ? 'val-credit' : 'val-debit';
+                var st = STATUS_MAP[item.status] || { cls: 'badge-aberto', lbl: String(item.status) };
+
+                rows +=
+                    '<tr>' +
+                    '<td>' + formatDate(item.dataLancamento) + '</td>' +
+                    '<td class="desc-cell" title="' + escapeHtml(item.descricao) + '">' + escapeHtml(item.descricao) + '</td>' +
+                    '<td><span class="badge-tipo ' + tipoCls + '">' + tipoLbl + '</span></td>' +
+                    '<td class="text-end"><span class="val-mono val-neutral">' + formatCurrency(item.valorOriginal) + '</span></td>' +
+                    '<td class="text-end"><span class="val-mono val-neutral">' + formatPercent(item.percentualTaxa) + '</span></td>' +
+                    '<td class="text-end"><span class="val-mono val-neutral">' + formatPercent(item.percentualDesconto) + '</span></td>' +
+                    '<td class="text-end"><span class="val-mono ' + valCls + '">' + formatCurrency(item.valorCalculado) + '</span></td>' +
+                    '<td>' + formatDate(item.dataCriacao) + '</td>' +
+                    '<td><span class="badge-status ' + st.cls + '">' + st.lbl + '</span></td>' +
+                    '<td class="text-center">' +
+                    '<div class="d-flex gap-1 justify-content-center">' +
+                    '<button class="btn-icon edit bg-primary text-white" title="Editar" onclick="editarLancamento(' + item.id + ')"><i class="bi bi-pencil"></i></button>' +
+                    '<button class="btn-icon success bg-success text-white"  title="Pagar" onclick="excluirLancamento(\'' + item.descricao + '\', ' + item.id + ')"><i class="bi bi-cash"></i></button>' +
+                    '<button class="btn-icon del bg-danger text-white"  title="Cancelar" onclick="excluirLancamento(\'' + item.descricao + '\', ' + item.id + ')"><i class="bi bi-x"></i></button>' +
+                    '</div></td>' +
+                    '</tr>';
+            }
+            tbody.innerHTML = rows;
+        }
+
+        /* ── Atualizar KPIs ────────────────────────────────────────── */
+        function updateKPIs(data) {
+            var creditos = data.filter(function (i) { return isCredito(i.Tipo); });
+            var debitos = data.filter(function (i) { return !isCredito(i.Tipo); });
+            var totCred = creditos.reduce(function (s, i) { return s + (i.ValorCalculado || 0); }, 0);
+            var totDeb = debitos.reduce(function (s, i) { return s + (i.ValorCalculado || 0); }, 0);
+            var saldo = totCred - totDeb;
+
+            document.getElementById('kpiTotal').textContent = formatCurrency(totCred + totDeb);
+            document.getElementById('kpiTotalSub').innerHTML =
+                '<span class="badge-tipo badge-credito me-1">' + creditos.length + ' crédito' + (creditos.length !== 1 ? 's' : '') + '</span>' +
+                '<span class="badge-tipo badge-debito">' + debitos.length + ' débito' + (debitos.length !== 1 ? 's' : '') + '</span>';
+
+            var saldoEl = document.getElementById('kpiSaldo');
+            var saldoIcon = document.querySelector('#kpiSaldoIcon .bi');
+            saldoEl.textContent = formatCurrency(Math.abs(saldo));
+            saldoEl.className = 'kpi-value ' + (saldo >= 0 ? 'val-credit' : 'val-debit');
+            if (saldoIcon) {
+                saldoIcon.className = saldo >= 0 ? 'bi bi-graph-up-arrow' : 'bi bi-graph-down-arrow';
+            }
+        }
+
+        /* ── Ações de linha ────────────────────────────────────────── */
+        function editarLancamento(id) {
+            console.log('[TODO] Editar lançamento id:', id);
+        }
+
+        function excluirLancamento(descricao, id) {
+            Swal.fire({
+                title: 'Confirmar exclusão',
+                html: 'Deseja excluir o lançamento <strong>' + descricao + '</strong>?<br><small class="text-muted">Esta ação não pode ser desfeita.</small>',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: '<i class="bi bi-trash3 me-1"></i>Cancelar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    console.log('[TODO] Excluir lançamento id:', id);
+                }
+            });
+        }
+
+        /* ── Listener do botão Atualizar ───────────────────────────── */
+        document.getElementById('btnPesquisar').addEventListener('click', pesquisar);
+
+
+        /* ═══════════════════════════════════════════════════════════════
+           MODAL DE CADASTRO
+        ═══════════════════════════════════════════════════════════════ */
+
+        function setFieldError(fieldId, show) {
+            var field = document.getElementById(fieldId);
+            var errId = 'err' + fieldId.replace('cad', '');
+            var err = document.getElementById(errId);
+            if (show) {
+                field.classList.add('is-invalid');
+                if (err) err.style.display = 'block';
+            } else {
+                field.classList.remove('is-invalid');
+                if (err) err.style.display = '';
+            }
+        }
+
+        function clearFieldError(fieldId) {
+            setFieldError(fieldId, false);
+        }
+
+        /* ── Tipo → exibe taxa ou desconto ─────────────────────────── */
+        function onCadTipoChange() {
+            var tipo = document.getElementById('cadTipo').value;
+            var wrapTaxa = document.getElementById('wrapTaxa');
+            var wrapDesconto = document.getElementById('wrapDesconto');
+
+            wrapTaxa.classList.add('d-none');
+            wrapDesconto.classList.add('d-none');
+
+            if (tipo === 'D') {
+                wrapTaxa.classList.remove('d-none');
+                document.getElementById('cadDesconto').value = '';
+            } else if (tipo === 'C') {
+                wrapDesconto.classList.remove('d-none');
+                document.getElementById('cadTaxa').value = '';
+            } else {
+                document.getElementById('cadTaxa').value = '';
+                document.getElementById('cadDesconto').value = '';
+            }
+
+            clearFieldError('cadTipo');
+            recalcularValor();
+        }
+
+        /* ── Cálculo automático ────────────────────────────────────── */
+        function recalcularValor() {
+            var tipo = document.getElementById('cadTipo').value;
+            var valorOriginal = parseBrDecimal(document.getElementById('cadValorOriginal').value);
+            var taxa = parseBrDecimal(document.getElementById('cadTaxa').value);
+            var desconto = parseBrDecimal(document.getElementById('cadDesconto').value);
+            var resultado = valorOriginal;
+
+            if (tipo === 'D' && taxa > 0) {
+                resultado = valorOriginal + (valorOriginal * taxa / 100);
+            } else if (tipo === 'C' && desconto > 0) {
+                resultado = valorOriginal - (valorOriginal * desconto / 100);
+            }
+
+            document.getElementById('cadValorCalculado').value = formatBrDecimal(resultado);
+        }
+
+        /* ── Validação ─────────────────────────────────────────────── */
+        function validarFormCadastro() {
+            var ok = true;
+
+            var descricao = document.getElementById('cadDescricao').value.trim();
+            setFieldError('cadDescricao', !descricao);
+            if (!descricao) ok = false;
+
+            var tipo = document.getElementById('cadTipo').value;
+            setFieldError('cadTipo', !tipo);
+            if (!tipo) ok = false;
+
+            var dataLanc = document.getElementById('cadDataLancamento').value.trim();
+            setFieldError('cadDataLancamento', !dataLanc);
+            if (!dataLanc) ok = false;
+
+            var valorOriginal = parseBrDecimal(document.getElementById('cadValorOriginal').value);
+            setFieldError('cadValorOriginal', valorOriginal <= 0);
+            if (valorOriginal <= 0) ok = false;
+
+            return ok;
+        }
+
+        /* ── Reset do modal ────────────────────────────────────────── */
+        function resetarFormCadastro() {
+            ['cadDescricao', 'cadValorOriginal', 'cadTaxa', 'cadDesconto', 'cadValorCalculado'].forEach(function (id) {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('cadTipo').value = '';
+            document.getElementById('wrapTaxa').classList.add('d-none');
+            document.getElementById('wrapDesconto').classList.add('d-none');
+
+            var fp = document.querySelector('#cadDataLancamento')._flatpickr;
+            if (fp) fp.clear();
+
+            ['cadDescricao', 'cadTipo', 'cadDataLancamento', 'cadValorOriginal'].forEach(clearFieldError);
+        }
+
+        /* ── Coleta dados do formulário ────────────────────────────── */
+        function coletarDadosFormulario() {
+            var fp = document.querySelector('#cadDataLancamento')._flatpickr;
+            var dataISO = fp && fp.selectedDates[0]
+                ? fp.selectedDates[0].toISOString().split('T')[0]
+                : '';
+
+            return {
+                descricao: document.getElementById('cadDescricao').value.trim(),
+                tipo: document.getElementById('cadTipo').value === 'C' ? 'Credito' : 'Debito',
+                valorOriginal: parseBrDecimal(document.getElementById('cadValorOriginal').value),
+                percentualTaxa: parseBrDecimal(document.getElementById('cadTaxa').value),
+                percentualDesconto: parseBrDecimal(document.getElementById('cadDesconto').value),
+                valorCalculado: parseBrDecimal(document.getElementById('cadValorCalculado').value),
+                dataLancamento: dataISO
+            };
+        }
+
+        /* ── Controle de loading do modal ──────────────────────────── */
+        function setModalLoading(loading) {
+            isSaving = loading;
+            var modal = document.getElementById('modalCadastro');
+            modal.querySelectorAll('input:not([readonly]), select').forEach(function (el) {
+                el.disabled = loading;
+            });
+            var btnSalvar = document.getElementById('btnSalvarCadastro');
+            btnSalvar.disabled = loading;
+            btnSalvar.innerHTML = loading
+                ? '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>&nbsp;Salvando...'
+                : '<i class="bi bi-check-lg"></i> Salvar Lançamento';
+            var btnCancelar = modal.querySelector('.btn-outline-custom[data-bs-dismiss]');
+            if (btnCancelar) btnCancelar.disabled = loading;
+            var btnClose = modal.querySelector('.btn-close');
+            if (btnClose) btnClose.style.visibility = loading ? 'hidden' : '';
+        }
+
+        /* Impede fechamento enquanto salva */
+        document.getElementById('modalCadastro').addEventListener('hide.bs.modal', function (e) {
+            if (isSaving) e.preventDefault();
+        });
+
+        /* ── Salvar lançamento ─────────────────────────────────────── */
+        function salvarLancamento() {
+            if (!validarFormCadastro()) return;
+
+            var dados = coletarDadosFormulario();
+            setModalLoading(true);
+
+            fetch(API_BASE, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dados)
+            })
+                .then(function (response) {
+                    if (!response.ok) throw new Error('HTTP ' + response.status + ' — ' + response.statusText);
+                    return response.text(); /* 200 OK sem body */
+                })
+                .then(function () {
+                    setModalLoading(false)
+                    bootstrap.Modal.getInstance(document.getElementById('modalCadastro')).hide();
+                    setTimeout(function () {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Lançamento cadastrado!',
+                            text: 'O lançamento foi salvo com sucesso.',
+                            confirmButtonColor: '#2563EB',
+                            confirmButtonText: 'OK',
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                        pesquisar();
+                    }, 350);
+                })
+                .catch(function (err) {
+                    setModalLoading(false);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro ao salvar',
+                        html: escapeHtml(err.message),
+                        confirmButtonColor: '#2563EB',
+                        confirmButtonText: 'Fechar'
+                    });
+                });
+        }
+
+        /* ── Event listeners do modal de cadastro ──────────────────── */
+        document.getElementById('cadTipo')
+            .addEventListener('change', onCadTipoChange);
+
+        document.getElementById('cadValorOriginal')
+            .addEventListener('input', function () {
+                clearFieldError('cadValorOriginal');
+                recalcularValor();
+            });
+
+        document.getElementById('cadTaxa')
+            .addEventListener('input', recalcularValor);
+
+        document.getElementById('cadDesconto')
+            .addEventListener('input', recalcularValor);
+
+        document.getElementById('cadDescricao')
+            .addEventListener('input', function () { clearFieldError('cadDescricao'); });
+
+        document.getElementById('btnSalvarCadastro')
+            .addEventListener('click', salvarLancamento);
+
+        document.getElementById('modalCadastro')
+            .addEventListener('hidden.bs.modal', resetarFormCadastro);
+
+
+        /* ═══════════════════════════════════════════════════════════════
+           MODAL DE EXPORTAÇÃO
+        ═══════════════════════════════════════════════════════════════ */
+
+        function clearExpError() {
+            var field = document.getElementById('expCompetencia');
+            var err = document.getElementById('errExpCompetencia');
+            field.classList.remove('is-invalid');
+            if (err) err.style.display = '';
+        }
+
+        /* Limpa o picker ao fechar o modal */
+        document.getElementById('modalExportacao').addEventListener('hidden.bs.modal', function () {
+            fpExportCompetencia.clear();
+            clearExpError();
+            document.querySelector('input[name="expFormato"][value="xlsx"]').checked = true;
+        });
+
+        document.getElementById('btnConfirmarExportacao').addEventListener('click', function () {
+            /* Validar competência */
+            var selectedDates = fpExportCompetencia.selectedDates;
+            if (!selectedDates || selectedDates.length === 0) {
+                var field = document.getElementById('expCompetencia');
+                var err = document.getElementById('errExpCompetencia');
+                field.classList.add('is-invalid');
+                if (err) err.style.display = 'block';
+                return;
+            }
+
+            var date = selectedDates[0];
+            var mes = String(date.getMonth() + 1).padStart(2, '0');
+            var ano = date.getFullYear();
+            var competencia = ano + '-' + mes;          /* ex: 2025-06 */
+            var formato = document.querySelector('input[name="expFormato"]:checked').value;
+
+            var url = API_BASE + '/exportar?competencia=' + competencia + '&tipoExportacao=' + formato;
+
+            /* Dispara download via âncora */
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = '';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            bootstrap.Modal.getInstance(document.getElementById('modalExportacao')).hide();
+        });
+
+        pesquisar();
+    </script>
+
+</body>
+</html>
