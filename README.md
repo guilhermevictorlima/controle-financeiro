@@ -2,6 +2,8 @@
 
 Sistema web para controle de lançamentos financeiros, desenvolvido como teste técnico. Permite registrar, listar e gerenciar entradas e saídas financeiras com uma API RESTful em ASP.NET Core e persistência em SQL Server.
 
+<img width="1280" height="582" alt="image" src="https://github.com/user-attachments/assets/26a4fcc4-f6ae-441c-9527-ef153733277e" />
+
 ---
 
 ## 🛠️ Tecnologias utilizadas
